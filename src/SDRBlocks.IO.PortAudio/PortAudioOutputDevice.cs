@@ -38,6 +38,7 @@ namespace SDRBlocks.IO.PortAudio
                 uint framesAvailable = buffer.FrameCount;
                 uint framesToCopy = Math.Min(frameCount, framesAvailable);
                 MemFuncs.memcpy(output, buffer.Ptr, (UIntPtr)(frameSize * framesToCopy));
+                buffer.Consume(framesToCopy);
 
                 // If we cannot fill the buffer completely, zero out the rest.
                 // Better than nothing.
