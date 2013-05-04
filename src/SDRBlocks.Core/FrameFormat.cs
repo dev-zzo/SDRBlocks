@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Runtime.InteropServices;
 
 namespace SDRBlocks.Core
 {
@@ -9,5 +6,21 @@ namespace SDRBlocks.Core
     {
         Float32,
         Complex,
+    }
+
+    public static class FrameFormatExtensions
+    {
+        public static uint Size(this FrameFormat ff)
+        {
+            switch (ff)
+            {
+                case FrameFormat.Float32:
+                    return sizeof(float);
+                case FrameFormat.Complex:
+                    return (uint)Marshal.SizeOf(typeof(Complex));
+                default:
+                    throw new SDRBlocksException("Invalid enumeration value");
+            }
+        }
     }
 }

@@ -7,13 +7,14 @@ namespace SDRBlocks.Core
     /// </summary>
     public abstract class StreamOutputBase : IStreamOutput
     {
-        public StreamOutputBase(uint sampleRate, uint channelCount, FrameFormat format, uint bufferSize, uint sampleSize)
+        public StreamOutputBase(uint sampleRate, uint channelCount, FrameFormat format, uint bufferSize)
         {
             this.bufferConsumed = new FrameBufferConsumedDelegate(this.OnBufferConsumed);
             this.SampleRate = sampleRate;
             this.ChannelCount = channelCount;
             this.Format = format;
-            this.ResizeBuffer(bufferSize, sampleSize);
+            uint frameSize = this.ChannelCount * this.Format.Size();
+            this.ResizeBuffer(bufferSize, frameSize);
         }
 
         #region IStreamOutput Members
@@ -86,7 +87,7 @@ namespace SDRBlocks.Core
         private readonly FrameBufferConsumedDelegate bufferConsumed;
         private IStreamInput attachedInput;
 
-        private void ResizeBuffer(uint sampleCount, uint sampleSize)
+        private void ResizeBuffer(uint frameCount, uint frameSize)
         {
             IStreamInput input = this.AttachedInput;
             this.AttachedInput = null;
@@ -95,7 +96,7 @@ namespace SDRBlocks.Core
                 this.Buffer.Dispose();
                 this.Buffer = null;
             }
-            this.Buffer = new FrameBuffer(sampleCount, sampleSize);
+            this.Buffer = new FrameBuffer(frameCount, frameSize);
             this.Buffer.ConsumedEvent += bufferConsumed;
             this.AttachedInput = input;
         }

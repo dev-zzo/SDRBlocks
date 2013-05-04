@@ -9,7 +9,7 @@ namespace SDRBlocks.IO.PortAudio
         public PortAudioInputDevice(int deviceIndex, uint channels, uint frameRate)
             : base(deviceIndex, channels, frameRate)
         {
-            this.Output = new StreamOutputSimple(frameRate, channels, 256 * 1024, 2*4);
+            this.Output = new StreamOutputSimple(frameRate, channels, FrameFormat.Float32, 256 * 1024);
             this.Outputs.Add(this.Output);
         }
 
