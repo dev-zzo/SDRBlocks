@@ -34,11 +34,11 @@ namespace SDRBlocks.IO.WMME
 
         public IntPtr Buffer { get; private set; }
 
-        public bool InQueue
+        public bool IsDone
         {
             get
             {
-                return this.header.flags.HasFlag(WaveHeaderFlags.InQueue);
+                return this.header.flags.HasFlag(WaveHeaderFlags.Done);
             }
         }
 

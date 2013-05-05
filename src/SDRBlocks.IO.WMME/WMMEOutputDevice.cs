@@ -20,6 +20,9 @@ namespace SDRBlocks.IO.WMME
             // Try FP format.
             WaveFormat format = WaveFormat.CreateIeeeFloatWaveFormat((int)frameRate, (int)channels);
             this.Open(deviceIndex, ref format);
+
+            this.bufferPumpThread = new Thread(this.BufferPumpProc);
+            this.bufferPumpThread.Start();
         }
 
         public uint FrameRate { get; private set; }
@@ -39,7 +42,9 @@ namespace SDRBlocks.IO.WMME
         private IntPtr hWaveOut;
         private bool isClosing;
         private WaveBuffer[] buffers;
-        private AutoResetEvent queueEmptyEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent queueEmptyEvent = new AutoResetEvent(false);
+        private readonly Thread bufferPumpThread;
+        private readonly AutoResetEvent bufferAvailableEvent = new AutoResetEvent(false);
 
         private void Open(int deviceIndex, ref WaveFormat format)
         {
@@ -49,18 +54,18 @@ namespace SDRBlocks.IO.WMME
                 out this.hWaveOut,
                 (IntPtr)deviceIndex,
                 ref format,
-                new WaveCallback(this.CallbackProc),
+                this.bufferAvailableEvent.SafeWaitHandle,
                 IntPtr.Zero,
-                WaveOpenFlags.CallbackFunction);
+                WaveOpenFlags.CallbackEvent);
             if (rv != MmResult.NoError)
             {
                 throw new WMMEException(rv);
             }
             
-            this.buffers = new WaveBuffer[3];
+            this.buffers = new WaveBuffer[2];
             for (int i = 0; i < this.buffers.Length; ++i)
             {
-                WaveBuffer buffer = new WaveBufferOut(this.hWaveOut, 44100, 8);
+                WaveBuffer buffer = new WaveBufferOut(this.hWaveOut, 22000, 8);
                 this.buffers[i] = buffer;
                 RefillAndSubmitBuffer(buffer);
             }
@@ -71,6 +76,7 @@ namespace SDRBlocks.IO.WMME
             if (this.hWaveOut != IntPtr.Zero)
             {
                 this.isClosing = true;
+                //Wave.waveOutReset(this.hWaveOut);
                 this.queueEmptyEvent.WaitOne();
                 foreach (WaveBuffer buffer in this.buffers)
                 {
@@ -110,38 +116,35 @@ namespace SDRBlocks.IO.WMME
             waveBuffer.SubmitBuffer();
         }
 
-        private void CallbackProc(IntPtr hWaveOut, WaveMessage message, IntPtr instance, IntPtr param1, IntPtr param2)
+        private void BufferPumpProc()
         {
-            Console.WriteLine("Wave output callback called.");
-
-            switch (message)
+            while (!this.isClosing)
             {
-                case WaveMessage.WaveOutDone:
-                    if (this.isClosing)
+                this.bufferAvailableEvent.WaitOne();
+                Console.WriteLine("BufferPumpProc awakens.");
+                foreach (WaveBuffer buffer in this.buffers)
+                {
+                    if (buffer.IsDone)
                     {
-                        bool queueEmpty = false;
-                        foreach (WaveBuffer buffer in this.buffers)
-                        {
-                            queueEmpty |= buffer.InQueue;
-                        }
-                        if (queueEmpty)
-                        {
-                            this.queueEmptyEvent.Set();
-                        }
+                        this.RefillAndSubmitBuffer(buffer);
                     }
-                    else
-                    {
-                        WaveHeader wavhdr = new WaveHeader();
-                        Marshal.PtrToStructure(param1, wavhdr);
-                        GCHandle bufferHandle = GCHandle.FromIntPtr(wavhdr.userData);
-                        WaveBuffer buffer = (WaveBuffer)bufferHandle.Target;
-                        RefillAndSubmitBuffer(buffer);
-                    }
-                    break;
-
-                default:
-                    break;
+                }
             }
+
+            Console.Write("BufferPumpProc waits for all buffers.");
+            bool allDone;
+            do
+            {
+                allDone = true;
+                foreach (WaveBuffer buffer in this.buffers)
+                {
+                    allDone &= buffer.IsDone;
+                }
+                Thread.Sleep(250);
+                Console.Write(".");
+            } while (!allDone);
+            this.queueEmptyEvent.Set();
+            Console.WriteLine("BufferPumpProc thread exits.");
         }
 
         #endregion

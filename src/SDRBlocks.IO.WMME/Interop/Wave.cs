@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace SDRBlocks.IO.WMME.Interop
 {
@@ -50,6 +51,8 @@ namespace SDRBlocks.IO.WMME.Interop
         // http://msdn.microsoft.com/en-us/library/dd743866%28VS.85%29.aspx
         [DllImport("winmm.dll")]
         public static extern MmResult waveOutOpen(out IntPtr hWaveOut, IntPtr uDeviceID, ref WaveFormat lpFormat, WaveCallback dwCallback, IntPtr dwInstance, WaveOpenFlags dwFlags);
+        [DllImport("winmm.dll")]
+        public static extern MmResult waveOutOpen(out IntPtr hWaveOut, IntPtr uDeviceID, ref WaveFormat lpFormat, SafeWaitHandle dwCallback, IntPtr dwInstance, WaveOpenFlags dwFlags);
 
         [DllImport("winmm.dll")]
         public static extern MmResult waveOutPrepareHeader(IntPtr hWaveOut, IntPtr lpWaveOutHdr, int uSize);
