@@ -62,10 +62,14 @@ namespace SDRBlocks.IO.WMME
                 throw new WMMEException(rv);
             }
             
-            this.buffers = new WaveBuffer[2];
+            // Hmm, interesting.
+            // If framesPerBuffer divides the frame rate evenly, there is no clicks.
+            // Otherwise, there are audible artifacts.
+            uint framesPerBuffer = 2205;
+            this.buffers = new WaveBuffer[3];
             for (int i = 0; i < this.buffers.Length; ++i)
             {
-                WaveBuffer buffer = new WaveBufferOut(this.hWaveOut, 22000, 8);
+                WaveBuffer buffer = new WaveBufferOut(this.hWaveOut, framesPerBuffer, 8);
                 this.buffers[i] = buffer;
                 RefillAndSubmitBuffer(buffer);
             }
@@ -121,7 +125,7 @@ namespace SDRBlocks.IO.WMME
             while (!this.isClosing)
             {
                 this.bufferAvailableEvent.WaitOne();
-                Console.WriteLine("BufferPumpProc awakens.");
+                //Console.WriteLine("BufferPumpProc awakens.");
                 foreach (WaveBuffer buffer in this.buffers)
                 {
                     if (buffer.IsDone)
