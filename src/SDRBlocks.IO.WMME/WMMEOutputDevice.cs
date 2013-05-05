@@ -31,9 +31,9 @@ namespace SDRBlocks.IO.WMME
                 WaveOpenFlags.CallbackEvent));
         }
 
-        protected override WaveBuffer CreateBuffer(IntPtr hWave, uint numFrames, uint frameSize)
+        protected override WaveBuffer CreateBuffer(uint numFrames, uint frameSize)
         {
-            return new WaveBufferOut(hWave, numFrames, frameSize);
+            return new WaveBufferOut(numFrames, frameSize);
         }
 
         protected override void ProcessBuffer(WaveBuffer waveBuffer)
@@ -61,7 +61,7 @@ namespace SDRBlocks.IO.WMME
                 MemFuncs.memset(waveBuffer.Buffer, 0, (UIntPtr)(this.FrameSize * frameCount));
             }
 
-            waveBuffer.SubmitBuffer();
+            waveBuffer.Submit();
         }
 
         protected override void Close()

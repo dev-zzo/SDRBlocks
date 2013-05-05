@@ -36,12 +36,12 @@ namespace SDRBlocks.Tester
                 }
             }
 
-            var osc = new Oscillator(44100, 1f, 666);
+            var input = new WMMEInputDevice(0, 2, 44100);
             var output = new WMMEOutputDevice(0, 2, 44100);
-            osc.IQ.AttachedInput = output.Input;
+            input.Output.AttachedInput = output.Input;
             Thread.Sleep(3000);
+            input.Dispose();
             output.Dispose();
-            osc.Dispose();
         }
     }
 }

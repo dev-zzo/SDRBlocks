@@ -6,10 +6,8 @@ namespace SDRBlocks.IO.WMME
 {
     public abstract class WaveBuffer : IDisposable
     {
-        public WaveBuffer(IntPtr hWave, uint numFrames, uint frameSize)
+        public WaveBuffer(uint numFrames, uint frameSize)
         {
-            this.hWave = hWave;
-
             this.Size = numFrames;
             int bufferSize = (int)(numFrames * frameSize);
             this.backBuffer = new byte[bufferSize];
@@ -23,8 +21,6 @@ namespace SDRBlocks.IO.WMME
             this.header.userData = (IntPtr)this.selfHandle;
             this.headerHandle = GCHandle.Alloc(this.header, GCHandleType.Pinned);
             this.headerPtr = this.headerHandle.AddrOfPinnedObject();
-
-            this.PrepareBuffer();
         }
 
         /// <summary>
@@ -45,13 +41,15 @@ namespace SDRBlocks.IO.WMME
         /// <summary>
         /// Submit the buffer to the driver for processing.
         /// </summary>
-        public abstract void SubmitBuffer();
+        public abstract void Submit();
+
+        public abstract void Prepare(IntPtr hWave);
 
         #region IDisposable Members
 
         public void Dispose()
         {
-            this.UnprepareBuffer();
+            this.Unprepare();
             this.dataHandle.Free();
             this.selfHandle.Free();
             this.headerHandle.Free();
@@ -65,9 +63,7 @@ namespace SDRBlocks.IO.WMME
         protected WaveHeader header;
         protected IntPtr headerPtr;
 
-        protected abstract void PrepareBuffer();
-
-        protected abstract void UnprepareBuffer();
+        protected abstract void Unprepare();
 
         private Array backBuffer;
         private GCHandle dataHandle;
@@ -79,22 +75,23 @@ namespace SDRBlocks.IO.WMME
 
     internal class WaveBufferOut : WaveBuffer
     {
-        public WaveBufferOut(IntPtr hWaveOut, uint numFrames, uint frameSize)
-            : base(hWaveOut, numFrames, frameSize)
+        public WaveBufferOut(uint numFrames, uint frameSize)
+            : base(numFrames, frameSize)
         {
         }
 
-        public override void SubmitBuffer()
+        public override void Submit()
         {
             WMMEException.Check(Wave.waveOutWrite(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }
 
-        protected override void PrepareBuffer()
+        public override void Prepare(IntPtr hWave)
         {
+            this.hWave = hWave;
             WMMEException.Check(Wave.waveOutPrepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }
 
-        protected override void UnprepareBuffer()
+        protected override void Unprepare()
         {
             WMMEException.Check(Wave.waveOutUnprepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }
@@ -102,22 +99,23 @@ namespace SDRBlocks.IO.WMME
 
     internal class WaveBufferIn : WaveBuffer
     {
-        public WaveBufferIn(IntPtr hWaveIn, uint numFrames, uint frameSize)
-            : base(hWaveIn, numFrames, frameSize)
+        public WaveBufferIn(uint numFrames, uint frameSize)
+            : base(numFrames, frameSize)
         {
         }
 
-        public override void SubmitBuffer()
+        public override void Submit()
         {
             WMMEException.Check(Wave.waveInAddBuffer(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }
 
-        protected override void PrepareBuffer()
+        public override void Prepare(IntPtr hWave)
         {
+            this.hWave = hWave;
             WMMEException.Check(Wave.waveInPrepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }
 
-        protected override void UnprepareBuffer()
+        protected override void Unprepare()
         {
             WMMEException.Check(Wave.waveInUnprepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }

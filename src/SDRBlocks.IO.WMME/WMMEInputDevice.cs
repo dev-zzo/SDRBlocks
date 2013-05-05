@@ -32,9 +32,9 @@ namespace SDRBlocks.IO.WMME
             WMMEException.Check(Wave.waveInStart(this.hWave));
         }
 
-        protected override WaveBuffer CreateBuffer(IntPtr hWave, uint numFrames, uint frameSize)
+        protected override WaveBuffer CreateBuffer(uint numFrames, uint frameSize)
         {
-            return new WaveBufferIn(hWave, numFrames, frameSize);
+            return new WaveBufferIn(numFrames, frameSize);
         }
 
         protected override void ProcessBuffer(WaveBuffer waveBuffer)
@@ -44,7 +44,7 @@ namespace SDRBlocks.IO.WMME
                 this.Output.Buffer.Refill(waveBuffer.Buffer, waveBuffer.Size);
             }
 
-            waveBuffer.SubmitBuffer();
+            waveBuffer.Submit();
         }
 
         protected override void Close()

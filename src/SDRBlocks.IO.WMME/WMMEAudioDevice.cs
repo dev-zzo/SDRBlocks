@@ -15,10 +15,10 @@ namespace SDRBlocks.IO.WMME
             this.bufferPumpThread = new Thread(this.BufferPumpProc);
             this.bufferPumpThread.Start();
 
+            this.CreateBuffers(bufferCount, framesPerBuffer, channels * sizeof(float));
             WaveFormat format = WaveFormat.CreateIeeeFloatWaveFormat((int)frameRate, (int)channels);
             this.Open(deviceIndex, ref format);
-
-            this.CreateBuffers(bufferCount, framesPerBuffer, channels * sizeof(float));
+            this.PrepareBuffers();
         }
 
         public uint FrameRate { get; private set; }
@@ -34,7 +34,7 @@ namespace SDRBlocks.IO.WMME
         protected readonly AutoResetEvent queueEmptyEvent = new AutoResetEvent(false);
 
         protected abstract void Open(int deviceIndex, ref WaveFormat format);
-        protected abstract WaveBuffer CreateBuffer(IntPtr hWave, uint numFrames, uint frameSize);
+        protected abstract WaveBuffer CreateBuffer(uint numFrames, uint frameSize);
         protected abstract void ProcessBuffer(WaveBuffer waveBuffer);
         protected abstract void Close();
 
@@ -56,9 +56,17 @@ namespace SDRBlocks.IO.WMME
             this.buffers = new WaveBuffer[bufferCount];
             for (int i = 0; i < this.buffers.Length; ++i)
             {
-                WaveBuffer buffer = this.CreateBuffer(this.hWave, framesPerBuffer, frameSize);
+                WaveBuffer buffer = this.CreateBuffer(framesPerBuffer, frameSize);
                 this.buffers[i] = buffer;
-                buffer.SubmitBuffer();
+                buffer.Submit();
+            }
+        }
+
+        private void PrepareBuffers()
+        {
+            foreach (WaveBuffer buffer in this.buffers)
+            {
+                buffer.Prepare(this.hWave);
             }
         }
 
