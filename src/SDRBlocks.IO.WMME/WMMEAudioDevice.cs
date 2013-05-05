@@ -18,12 +18,14 @@ namespace SDRBlocks.IO.WMME
             this.CreateBuffers(bufferCount, framesPerBuffer, channels * sizeof(float));
             WaveFormat format = WaveFormat.CreateIeeeFloatWaveFormat((int)frameRate, (int)channels);
             this.Open(deviceIndex, ref format);
-            this.PrepareBuffers();
+            this.PrepareAndSubmitBuffers();
         }
 
         public uint FrameRate { get; private set; }
 
         public uint ChannelCount { get; private set; }
+
+        #region Implementation details
 
         protected uint FrameSize { get { return this.ChannelCount * sizeof(float); } }
 
@@ -31,12 +33,38 @@ namespace SDRBlocks.IO.WMME
         protected IntPtr hWave;
         protected WaveBuffer[] buffers;
         protected readonly AutoResetEvent bufferAvailableEvent = new AutoResetEvent(false);
-        protected readonly AutoResetEvent queueEmptyEvent = new AutoResetEvent(false);
 
         protected abstract void Open(int deviceIndex, ref WaveFormat format);
         protected abstract WaveBuffer CreateBuffer(uint numFrames, uint frameSize);
         protected abstract void ProcessBuffer(WaveBuffer waveBuffer);
         protected abstract void Close();
+
+        protected void ReleaseBuffers()
+        {
+            foreach (WaveBuffer buffer in this.buffers)
+            {
+                bool bufferDisposed = false;
+                do
+                {
+                    try
+                    {
+                        buffer.Dispose();
+                        bufferDisposed = true;
+                    }
+                    catch (WMMEException ex)
+                    {
+                        if (ex.ResultCode != MmResult.WaveStillPlaying)
+                        {
+                            throw;
+                        }
+                        else
+                        {
+                            Thread.Sleep(250);
+                        }
+                    }
+                } while (!bufferDisposed);
+            }
+        }
 
         protected override void Dispose(bool disposing)
         {
@@ -48,25 +76,20 @@ namespace SDRBlocks.IO.WMME
 
         private void CreateBuffers(uint bufferCount, uint framesPerBuffer, uint frameSize)
         {
-            if (this.hWave == IntPtr.Zero)
-            {
-                throw new WMMEException("The device has to be opened prior to buffer creation.");
-            }
-
             this.buffers = new WaveBuffer[bufferCount];
             for (int i = 0; i < this.buffers.Length; ++i)
             {
                 WaveBuffer buffer = this.CreateBuffer(framesPerBuffer, frameSize);
                 this.buffers[i] = buffer;
-                buffer.Submit();
             }
         }
 
-        private void PrepareBuffers()
+        private void PrepareAndSubmitBuffers()
         {
             foreach (WaveBuffer buffer in this.buffers)
             {
                 buffer.Prepare(this.hWave);
+                buffer.Submit();
             }
         }
 
@@ -83,20 +106,8 @@ namespace SDRBlocks.IO.WMME
                     }
                 }
             }
-
-            for (bool allDone = true; allDone; )
-            {
-                foreach (WaveBuffer buffer in this.buffers)
-                {
-                    allDone &= buffer.IsDone;
-                }
-                if (!allDone)
-                {
-                    Thread.Sleep(250);
-                }
-            }
-            this.queueEmptyEvent.Set();
         }
 
+        #endregion
     }
 }

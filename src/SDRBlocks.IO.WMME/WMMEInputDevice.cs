@@ -9,7 +9,7 @@ namespace SDRBlocks.IO.WMME
         public WMMEInputDevice(int deviceIndex, uint channels, uint frameRate)
             : base(deviceIndex, channels, frameRate, 3, 2048)
         {
-            uint outputBufferSize = 4 * 2048;
+            uint outputBufferSize = 8 * 2048;
             this.Output = new StreamOutputSimple(channels, FrameFormat.Float32, frameRate, outputBufferSize);
             this.Outputs.Add(this.Output);
         }
@@ -53,11 +53,7 @@ namespace SDRBlocks.IO.WMME
             {
                 this.isClosing = true;
                 Wave.waveInStop(this.hWave);
-                this.queueEmptyEvent.WaitOne();
-                foreach (WaveBuffer buffer in this.buffers)
-                {
-                    buffer.Dispose();
-                }
+                this.ReleaseBuffers();
                 Wave.waveInClose(this.hWave);
                 this.hWave = IntPtr.Zero;
             }

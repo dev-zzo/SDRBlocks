@@ -39,7 +39,7 @@ namespace SDRBlocks.Tester
             var input = new WMMEInputDevice(0, 2, 44100);
             var output = new WMMEOutputDevice(0, 2, 44100);
             input.Output.AttachedInput = output.Input;
-            Thread.Sleep(3000);
+            Thread.Sleep(15000);
             input.Dispose();
             output.Dispose();
         }

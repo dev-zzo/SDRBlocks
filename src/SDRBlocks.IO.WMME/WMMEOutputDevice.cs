@@ -69,11 +69,7 @@ namespace SDRBlocks.IO.WMME
             if (this.hWave != IntPtr.Zero)
             {
                 this.isClosing = true;
-                this.queueEmptyEvent.WaitOne();
-                foreach (WaveBuffer buffer in this.buffers)
-                {
-                    buffer.Dispose();
-                }
+                this.ReleaseBuffers();
                 Wave.waveOutClose(this.hWave);
                 this.hWave = IntPtr.Zero;
             }
