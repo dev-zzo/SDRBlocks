@@ -72,10 +72,8 @@ namespace SDRBlocks.Core
         /// <param name="count"></param>
         public void Consume(uint count)
         {
-            IntPtr src = (IntPtr)((long)this.pointer + count * this.frameSize);
-
-            MemFuncs.memmove(this.pointer, src, (UIntPtr)(this.FrameCount - count));
-            
+            IntPtr src = this.pointer + (int)(count * this.frameSize);
+            MemFuncs.memmove(this.pointer, src, (UIntPtr)((this.Size - count) * this.frameSize));            
             this.FrameCount -= count;
 
             if (this.ConsumedEvent != null)

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Threading;
 using SDRBlocks.Core;
 using SDRBlocks.Core.Interop;
 using SDRBlocks.IO.WMME.Interop;
-using System.Threading;
 
 namespace SDRBlocks.IO.WMME
 {
@@ -62,10 +61,7 @@ namespace SDRBlocks.IO.WMME
                 throw new WMMEException(rv);
             }
             
-            // Hmm, interesting.
-            // If framesPerBuffer divides the frame rate evenly, there is no clicks.
-            // Otherwise, there are audible artifacts.
-            uint framesPerBuffer = 2205;
+            const uint framesPerBuffer = 1024;
             this.buffers = new WaveBuffer[3];
             for (int i = 0; i < this.buffers.Length; ++i)
             {

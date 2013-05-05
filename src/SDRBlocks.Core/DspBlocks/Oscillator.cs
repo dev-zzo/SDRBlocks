@@ -52,13 +52,11 @@ namespace SDRBlocks.Core.DspBlocks
 
         protected unsafe void Refill()
         {
-            Console.WriteLine("Oscillator::Refill called.");
             var buffer = this.IQ.Buffer;
             Complex* data = (Complex*)buffer.Ptr.ToPointer();
             for (uint i = buffer.FrameCount; i < buffer.Size; ++i)
             {
                 data[i] = FastMath.SinCos(this.currentAngle) * this.Amplitude;
-                // TODO: Think of a way to reduce error here.
                 this.currentAngle += this.sampleStep;
                 while (this.currentAngle > FastMath.TWOPI)
                 {
