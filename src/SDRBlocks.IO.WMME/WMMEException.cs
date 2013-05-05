@@ -16,5 +16,13 @@ namespace SDRBlocks.IO.WMME
           System.Runtime.Serialization.StreamingContext context)
             : base(info, context) { }
         internal MmResult ResultCode { get; private set; }
+
+        internal static void Check(MmResult rv)
+        {
+            if (rv != MmResult.NoError)
+            {
+                throw new WMMEException(rv);
+            }
+        }
     }
 }

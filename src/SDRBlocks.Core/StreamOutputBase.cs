@@ -7,7 +7,7 @@ namespace SDRBlocks.Core
     /// </summary>
     public abstract class StreamOutputBase : IStreamOutput
     {
-        public StreamOutputBase(uint sampleRate, uint channelCount, FrameFormat format, uint bufferSize)
+        public StreamOutputBase(uint channelCount, FrameFormat format, uint sampleRate, uint bufferSize)
         {
             this.bufferConsumed = new FrameBufferConsumedDelegate(this.OnBufferConsumed);
             this.SampleRate = sampleRate;

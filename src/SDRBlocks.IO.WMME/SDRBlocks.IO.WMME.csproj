@@ -47,7 +47,9 @@
     <Compile Include="Interop\MmTime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WaveBuffer.cs" />
+    <Compile Include="WMMEAudioDevice.cs" />
     <Compile Include="WMMEException.cs" />
+    <Compile Include="WMMEInputDevice.cs" />
     <Compile Include="WMMEOutputDevice.cs" />
   </ItemGroup>
   <ItemGroup>

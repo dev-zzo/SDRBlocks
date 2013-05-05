@@ -39,9 +39,6 @@ namespace SDRBlocks.IO.WMME.Interop
     internal static class Wave
     {
         [DllImport("winmm.dll")]
-        public static extern Int32 mmioStringToFOURCC([MarshalAs(UnmanagedType.LPStr)] String s, int flags);
-
-        [DllImport("winmm.dll")]
         public static extern Int32 waveOutGetNumDevs();
 
         // http://msdn.microsoft.com/en-us/library/dd743857%28VS.85%29.aspx
@@ -58,30 +55,10 @@ namespace SDRBlocks.IO.WMME.Interop
         public static extern MmResult waveOutPrepareHeader(IntPtr hWaveOut, IntPtr lpWaveOutHdr, int uSize);
 
         [DllImport("winmm.dll")]
-        public static extern MmResult waveOutUnprepareHeader(IntPtr hWaveOut, IntPtr lpWaveOutHdr, int uSize);
-
-        [DllImport("winmm.dll")]
         public static extern MmResult waveOutWrite(IntPtr hWaveOut, IntPtr lpWaveOutHdr, int uSize);
 
         [DllImport("winmm.dll")]
-        public static extern MmResult waveOutReset(IntPtr hWaveOut);
-
-        [DllImport("winmm.dll")]
-        public static extern MmResult waveOutPause(IntPtr hWaveOut);
-
-        [DllImport("winmm.dll")]
-        public static extern MmResult waveOutRestart(IntPtr hWaveOut);
-
-        // http://msdn.microsoft.com/en-us/library/dd743863%28VS.85%29.aspx
-        [DllImport("winmm.dll")]
-        public static extern MmResult waveOutGetPosition(IntPtr hWaveOut, out MmTime mmTime, int uSize);
-
-        // http://msdn.microsoft.com/en-us/library/dd743874%28VS.85%29.aspx
-        [DllImport("winmm.dll")]
-        public static extern MmResult waveOutSetVolume(IntPtr hWaveOut, int dwVolume);
-
-        [DllImport("winmm.dll")]
-        public static extern MmResult waveOutGetVolume(IntPtr hWaveOut, out int dwVolume);
+        public static extern MmResult waveOutUnprepareHeader(IntPtr hWaveOut, IntPtr lpWaveOutHdr, int uSize);
 
         [DllImport("winmm.dll")]
         public static extern MmResult waveOutClose(IntPtr hWaveOut);
@@ -94,28 +71,26 @@ namespace SDRBlocks.IO.WMME.Interop
         [DllImport("winmm.dll", CharSet = CharSet.Auto)]
         public static extern MmResult waveInGetDevCaps(IntPtr deviceID, out WaveInCapabilities waveInCaps, int waveInCapsSize);
 
-        // http://msdn.microsoft.com/en-us/library/dd743838%28VS.85%29.aspx
-        [DllImport("winmm.dll")]
-        public static extern MmResult waveInAddBuffer(IntPtr hWaveIn, ref WaveHeader pwh, int cbwh);
-
         // http://msdn.microsoft.com/en-us/library/dd743847%28VS.85%29.aspx
         [DllImport("winmm.dll")]
         public static extern MmResult waveInOpen(out IntPtr hWaveIn, IntPtr uDeviceID, ref WaveFormat lpFormat, WaveCallback dwCallback, IntPtr dwInstance, WaveOpenFlags dwFlags);
+        [DllImport("winmm.dll")]
+        public static extern MmResult waveInOpen(out IntPtr hWaveIn, IntPtr uDeviceID, ref WaveFormat lpFormat, SafeWaitHandle dwCallback, IntPtr dwInstance, WaveOpenFlags dwFlags);
 
         // http://msdn.microsoft.com/en-us/library/dd743848%28VS.85%29.aspx
         [DllImport("winmm.dll")]
-        public static extern MmResult waveInPrepareHeader(IntPtr hWaveIn, ref WaveHeader lpWaveInHdr, int uSize);
-
-        [DllImport("winmm.dll")]
-        public static extern MmResult waveInUnprepareHeader(IntPtr hWaveIn, ref WaveHeader lpWaveInHdr, int uSize);
-
-        // http://msdn.microsoft.com/en-us/library/dd743850%28VS.85%29.aspx
-        [DllImport("winmm.dll")]
-        public static extern MmResult waveInReset(IntPtr hWaveIn);
+        public static extern MmResult waveInPrepareHeader(IntPtr hWaveIn, IntPtr lpWaveInHdr, int uSize);
 
         // http://msdn.microsoft.com/en-us/library/dd743851%28VS.85%29.aspx
         [DllImport("winmm.dll")]
         public static extern MmResult waveInStart(IntPtr hWaveIn);
+
+        // http://msdn.microsoft.com/en-us/library/dd743838%28VS.85%29.aspx
+        [DllImport("winmm.dll")]
+        public static extern MmResult waveInAddBuffer(IntPtr hWaveIn, IntPtr lpWaveInHdr, int cbwh);
+
+        [DllImport("winmm.dll")]
+        public static extern MmResult waveInUnprepareHeader(IntPtr hWaveIn, IntPtr lpWaveInHdr, int uSize);
 
         // http://msdn.microsoft.com/en-us/library/dd743852%28VS.85%29.aspx
         [DllImport("winmm.dll")]

@@ -1,95 +1,43 @@
 ﻿using System;
-using System.Threading;
 using SDRBlocks.Core;
 using SDRBlocks.Core.Interop;
 using SDRBlocks.IO.WMME.Interop;
 
 namespace SDRBlocks.IO.WMME
 {
-    public sealed class WMMEOutputDevice : DspBlockBase
+    public sealed class WMMEOutputDevice : WMMEAudioDevice
     {
         public WMMEOutputDevice(int deviceIndex, uint channels, uint frameRate)
+            : base(deviceIndex, channels, frameRate, 3, 1024)
         {
-            this.FrameRate = frameRate;
-            this.ChannelCount = channels;
-
             this.Input = new StreamInputSimple();
             this.Inputs.Add(this.Input);
-
-            // Try FP format.
-            WaveFormat format = WaveFormat.CreateIeeeFloatWaveFormat((int)frameRate, (int)channels);
-            this.Open(deviceIndex, ref format);
-
-            this.bufferPumpThread = new Thread(this.BufferPumpProc);
-            this.bufferPumpThread.Start();
         }
-
-        public uint FrameRate { get; private set; }
-
-        public uint ChannelCount { get; private set; }
 
         public IStreamInput Input { get; private set; }
 
         #region Implementation details
 
-        protected override void Dispose(bool disposing)
-        {
-            this.Close();
-            base.Dispose(disposing);
-        }
-
-        private IntPtr hWaveOut;
-        private bool isClosing;
-        private WaveBuffer[] buffers;
-        private readonly AutoResetEvent queueEmptyEvent = new AutoResetEvent(false);
-        private readonly Thread bufferPumpThread;
-        private readonly AutoResetEvent bufferAvailableEvent = new AutoResetEvent(false);
-
-        private void Open(int deviceIndex, ref WaveFormat format)
+        protected override void Open(int deviceIndex, ref WaveFormat format)
         {
             this.isClosing = false;
 
-            MmResult rv = Wave.waveOutOpen(
-                out this.hWaveOut,
+            WMMEException.Check(Wave.waveOutOpen(
+                out this.hWave,
                 (IntPtr)deviceIndex,
                 ref format,
                 this.bufferAvailableEvent.SafeWaitHandle,
                 IntPtr.Zero,
-                WaveOpenFlags.CallbackEvent);
-            if (rv != MmResult.NoError)
-            {
-                throw new WMMEException(rv);
-            }
-            
-            const uint framesPerBuffer = 1024;
-            this.buffers = new WaveBuffer[3];
-            for (int i = 0; i < this.buffers.Length; ++i)
-            {
-                WaveBuffer buffer = new WaveBufferOut(this.hWaveOut, framesPerBuffer, 8);
-                this.buffers[i] = buffer;
-                RefillAndSubmitBuffer(buffer);
-            }
+                WaveOpenFlags.CallbackEvent));
         }
 
-        private void Close()
+        protected override WaveBuffer CreateBuffer(IntPtr hWave, uint numFrames, uint frameSize)
         {
-            if (this.hWaveOut != IntPtr.Zero)
-            {
-                this.isClosing = true;
-                //Wave.waveOutReset(this.hWaveOut);
-                this.queueEmptyEvent.WaitOne();
-                foreach (WaveBuffer buffer in this.buffers)
-                {
-                    buffer.Dispose();
-                }
-                Wave.waveOutClose(this.hWaveOut);
-                this.hWaveOut = IntPtr.Zero;
-            }
+            return new WaveBufferOut(hWave, numFrames, frameSize);
         }
 
-        private void RefillAndSubmitBuffer(WaveBuffer waveBuffer)
+        protected override void ProcessBuffer(WaveBuffer waveBuffer)
         {
-            uint frameSize = this.ChannelCount * sizeof(float);
             uint frameCount = waveBuffer.Size;
 
             if (this.Input.AttachedOutput != null)
@@ -98,53 +46,37 @@ namespace SDRBlocks.IO.WMME
 
                 uint framesAvailable = frameBuffer.FrameCount;
                 uint framesToCopy = Math.Min(frameCount, framesAvailable);
-                MemFuncs.memcpy(waveBuffer.Buffer, frameBuffer.Ptr, (UIntPtr)(frameSize * framesToCopy));
+                MemFuncs.memcpy(waveBuffer.Buffer, frameBuffer.Ptr, (UIntPtr)(this.FrameSize * framesToCopy));
                 frameBuffer.Consume(framesToCopy);
 
                 if (framesToCopy < frameCount)
                 {
                     uint framesToZero = frameCount - framesToCopy;
-                    IntPtr ptr = frameBuffer.Ptr + (int)(frameSize * framesToCopy);
-                    MemFuncs.memset(ptr, 0, (UIntPtr)(frameSize * framesToZero));
+                    IntPtr ptr = frameBuffer.Ptr + (int)(this.FrameSize * framesToCopy);
+                    MemFuncs.memset(ptr, 0, (UIntPtr)(this.FrameSize * framesToZero));
                 }
             }
             else
             {
-                MemFuncs.memset(waveBuffer.Buffer, 0, (UIntPtr)(frameSize * frameCount));
+                MemFuncs.memset(waveBuffer.Buffer, 0, (UIntPtr)(this.FrameSize * frameCount));
             }
 
             waveBuffer.SubmitBuffer();
         }
 
-        private void BufferPumpProc()
+        protected override void Close()
         {
-            while (!this.isClosing)
+            if (this.hWave != IntPtr.Zero)
             {
-                this.bufferAvailableEvent.WaitOne();
-                //Console.WriteLine("BufferPumpProc awakens.");
+                this.isClosing = true;
+                this.queueEmptyEvent.WaitOne();
                 foreach (WaveBuffer buffer in this.buffers)
                 {
-                    if (buffer.IsDone)
-                    {
-                        this.RefillAndSubmitBuffer(buffer);
-                    }
+                    buffer.Dispose();
                 }
+                Wave.waveOutClose(this.hWave);
+                this.hWave = IntPtr.Zero;
             }
-
-            Console.Write("BufferPumpProc waits for all buffers.");
-            bool allDone;
-            do
-            {
-                allDone = true;
-                foreach (WaveBuffer buffer in this.buffers)
-                {
-                    allDone &= buffer.IsDone;
-                }
-                Thread.Sleep(250);
-                Console.Write(".");
-            } while (!allDone);
-            this.queueEmptyEvent.Set();
-            Console.WriteLine("BufferPumpProc thread exits.");
         }
 
         #endregion

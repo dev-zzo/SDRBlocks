@@ -7,7 +7,7 @@ namespace SDRBlocks.IO.WMME.Interop
     /// Wave Header Flags enumeration
     /// </summary>
     [Flags]
-    internal enum WaveHeaderFlags
+    public enum WaveHeaderFlags
     {
         /// <summary>
         /// WHDR_DONE
@@ -41,7 +41,7 @@ namespace SDRBlocks.IO.WMME.Interop
     /// http://msdn.microsoft.com/en-us/library/dd743837%28VS.85%29.aspx
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    internal class WaveHeader
+    public class WaveHeader
     {
         /// <summary>
         /// Pointer to the waveform buffer. (lpData)

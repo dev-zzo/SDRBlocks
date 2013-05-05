@@ -4,8 +4,8 @@ namespace SDRBlocks.Core
 {
     public class StreamOutputSimple : StreamOutputBase
     {
-        public StreamOutputSimple(uint sampleRate, uint channelCount, FrameFormat format, uint bufferSize)
-            : base(sampleRate, channelCount, format, bufferSize)
+        public StreamOutputSimple(uint channelCount, FrameFormat format, uint frameRate, uint bufferSize)
+            : base(channelCount, format, frameRate, bufferSize)
         {
         }
     }

@@ -8,7 +8,7 @@ namespace SDRBlocks.Core
 
     public delegate void FrameBufferConsumedDelegate();
 
-    public unsafe sealed class FrameBuffer : IDisposable
+    public sealed class FrameBuffer : IDisposable
     {
         public FrameBuffer(uint frameCount, uint frameSize)
         {
@@ -20,8 +20,6 @@ namespace SDRBlocks.Core
             this.gcHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
             this.pointer = (IntPtr)(((long)this.gcHandle.AddrOfPinnedObject() + 0x0000000F) & ~0x0000000F);
         }
-
-        public void* Address { get { return this.pointer.ToPointer(); } }
 
         public IntPtr Ptr { get { return this.pointer; } }
 

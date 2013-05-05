@@ -7,7 +7,7 @@ namespace SDRBlocks.IO.WMME.Interop
     /// Represents a Wave file format
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 2)]
-    internal struct WaveFormat
+    public struct WaveFormat
     {
         /// <summary>format type</summary>
         private WaveFormatEncoding waveFormatTag;

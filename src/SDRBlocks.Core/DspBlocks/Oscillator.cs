@@ -15,7 +15,7 @@ namespace SDRBlocks.Core.DspBlocks
             this.Amplitude = amplitude;
             this.Frequency = freq;
 
-            StreamOutputSimple iq = new StreamOutputSimple(sampleRate, 1, FrameFormat.Complex, 65536);
+            StreamOutputSimple iq = new StreamOutputSimple(1, FrameFormat.Complex, sampleRate, 65536);
             iq.ConsumedEvent += new OutputBufferConsumedDelegate(OnOutputConsumed);
             this.IQ = iq;
             this.Outputs.Add(iq);

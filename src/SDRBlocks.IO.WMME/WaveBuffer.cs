@@ -4,7 +4,7 @@ using SDRBlocks.IO.WMME.Interop;
 
 namespace SDRBlocks.IO.WMME
 {
-    internal abstract class WaveBuffer : IDisposable
+    public abstract class WaveBuffer : IDisposable
     {
         public WaveBuffer(IntPtr hWave, uint numFrames, uint frameSize)
         {
@@ -86,29 +86,40 @@ namespace SDRBlocks.IO.WMME
 
         public override void SubmitBuffer()
         {
-            MmResult rv = Wave.waveOutWrite(this.hWave, this.headerPtr, Marshal.SizeOf(this.header));
-            if (rv != MmResult.NoError)
-            {
-                throw new WMMEException(rv);
-            }
+            WMMEException.Check(Wave.waveOutWrite(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }
 
         protected override void PrepareBuffer()
         {
-            MmResult rv = Wave.waveOutPrepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header));
-            if (rv != MmResult.NoError)
-            {
-                throw new WMMEException(rv);
-            }
+            WMMEException.Check(Wave.waveOutPrepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }
 
         protected override void UnprepareBuffer()
         {
-            MmResult rv = Wave.waveOutUnprepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header));
-            if (rv != MmResult.NoError)
-            {
-                throw new WMMEException(rv);
-            }
+            WMMEException.Check(Wave.waveOutUnprepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
+        }
+    }
+
+    internal class WaveBufferIn : WaveBuffer
+    {
+        public WaveBufferIn(IntPtr hWaveIn, uint numFrames, uint frameSize)
+            : base(hWaveIn, numFrames, frameSize)
+        {
+        }
+
+        public override void SubmitBuffer()
+        {
+            WMMEException.Check(Wave.waveInAddBuffer(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
+        }
+
+        protected override void PrepareBuffer()
+        {
+            WMMEException.Check(Wave.waveInPrepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
+        }
+
+        protected override void UnprepareBuffer()
+        {
+            WMMEException.Check(Wave.waveInUnprepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }
     }
 }
