@@ -33,7 +33,7 @@ namespace SDRBlocks.Core
         /// <summary>
         /// Count of actual frames in the buffer.
         /// </summary>
-        public uint FrameCount { get; private set; }
+        public uint FrameCount { get; set; }
 
         public event FrameBufferRefilledDelegate RefilledEvent;
 

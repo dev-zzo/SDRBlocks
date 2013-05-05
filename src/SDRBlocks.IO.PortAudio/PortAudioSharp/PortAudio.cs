@@ -363,13 +363,15 @@ namespace PortAudioSharp {
             {
                 if (inputParameters.HasValue)
                 {
-                    ip = Marshal.AllocHGlobal(Marshal.SizeOf(inputParameters.Value));
+                    int size = Marshal.SizeOf(inputParameters.Value);
+                    ip = Marshal.AllocHGlobal(size);
                     Marshal.StructureToPtr(inputParameters.Value, ip, false);
                 }
                 if (outputParameters.HasValue)
                 {
-                    ip = Marshal.AllocHGlobal(Marshal.SizeOf(inputParameters.Value));
-                    Marshal.StructureToPtr(inputParameters.Value, ip, false);
+                    int size = Marshal.SizeOf(outputParameters.Value);
+                    op = Marshal.AllocHGlobal(size);
+                    Marshal.StructureToPtr(outputParameters.Value, op, false);
                 }
                 return Pa_IsFormatSupported(ip, op, sampleRate);
             }
@@ -412,8 +414,8 @@ namespace PortAudioSharp {
                 }
                 if (outputParameters.HasValue)
                 {
-                    ip = Marshal.AllocHGlobal(Marshal.SizeOf(inputParameters.Value));
-                    Marshal.StructureToPtr(inputParameters.Value, ip, false);
+                    op = Marshal.AllocHGlobal(Marshal.SizeOf(outputParameters.Value));
+                    Marshal.StructureToPtr(outputParameters.Value, op, false);
                 }
                 return Pa_OpenStream(out stream, ip, op, sampleRate, framesPerBuffer, streamFlags, streamCallback, userData);
             }

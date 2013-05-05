@@ -8,10 +8,10 @@ namespace SDRBlocks.IO.PortAudio
 {
     public abstract class PortAudioDevice : DspBlockBase
     {
-        public PortAudioDevice(int deviceIndex, uint channels, uint frameeRate)
+        public PortAudioDevice(int deviceIndex, uint channels, uint frameRate)
         {
             this.paCallback = new PortAudioAPI.PaStreamCallbackDelegate(this.PaStreamCallback);
-            this.FrameRate = frameeRate;
+            this.FrameRate = frameRate;
             this.ChannelCount = channels;
             InitializePaStream(deviceIndex);
         }

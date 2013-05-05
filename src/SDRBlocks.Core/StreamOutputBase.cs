@@ -60,12 +60,14 @@ namespace SDRBlocks.Core
 
         internal void NotifyOnAttach(IStreamInput input)
         {
+            this.attachedInput = input;
             this.OnInputAttached();
         }
 
-        internal void NotifyOnDetach(IStreamInput input)
+        internal void NotifyOnDetach()
         {
             this.OnInputDetached();
+            this.attachedInput = null;
         }
 
         protected virtual void OnInputAttached()
@@ -104,7 +106,8 @@ namespace SDRBlocks.Core
         private void AttachInput(IStreamInput input)
         {
             this.DetachInput();
-            this.attachedInput = input;
+            this.NotifyOnAttach(input);
+            // Notify the attached entity
             StreamInputBase ci = this.attachedInput as StreamInputBase;
             ci.NotifyOnAttach(this);
         }
@@ -113,9 +116,10 @@ namespace SDRBlocks.Core
         {
             if (this.attachedInput != null)
             {
-                this.attachedInput = null;
+                // Notify the detached entity
                 StreamInputBase ci = this.attachedInput as StreamInputBase;
-                ci.NotifyOnDetach(this);
+                ci.NotifyOnDetach();
+                this.NotifyOnDetach();
             }
         }
     }

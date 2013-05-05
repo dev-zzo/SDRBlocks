@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SDRBlocks.IO.PortAudio;
 using System.Threading;
+using SDRBlocks.Core.DspBlocks;
+using SDRBlocks.IO.WMME;
 
 namespace SDRBlocks.Tester
 {
@@ -11,13 +9,39 @@ namespace SDRBlocks.Tester
     {
         static void Main(string[] args)
         {
-            Module m = new Module();
-            var list = m.Enumerator.EnumerateInputDevices();
-            var mod = new PortAudioInputDevice(1, 2, 44100);
-            mod.Start();
+            string inputId = String.Empty;
+            string outputId = String.Empty;
+
+            var en = new DeviceEnumerator();
+
+            var inputList = en.EnumerateInputDevices();
+            Console.WriteLine("Input devices available:");
+            foreach (var item in inputList)
+            {
+                Console.WriteLine("{0}: {1}", item.Id, item.DeviceName);
+                if (item.DeviceName.StartsWith("Realtek"))
+                {
+                    inputId = item.Id;
+                }
+            }
+
+            var outputList = en.EnumerateOutputDevices();
+            Console.WriteLine("Output devices available:");
+            foreach (var item in outputList)
+            {
+                Console.WriteLine("{0}: {1}", item.Id, item.DeviceName);
+                if (item.DeviceName.StartsWith("Realtek"))
+                {
+                    outputId = item.Id;
+                }
+            }
+
+            var osc = new Oscillator(44100, 1f, 440);
+            var output = new WMMEOutputDevice(0, 2, 44100);
+            osc.IQ.AttachedInput = output.Input;
             Thread.Sleep(5000);
-            mod.Stop();
-            mod.Dispose();
+            output.Dispose();
+            osc.Dispose();
         }
     }
 }

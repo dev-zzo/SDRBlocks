@@ -35,14 +35,16 @@ namespace SDRBlocks.Core
 
         internal void NotifyOnAttach(IStreamOutput output)
         {
+            this.attachedOutput = output;
             output.Buffer.RefilledEvent += this.bufferRefilled;
             this.OnOutputAttached();
         }
 
-        internal void NotifyOnDetach(IStreamOutput output)
+        internal void NotifyOnDetach()
         {
-            output.Buffer.RefilledEvent -= this.bufferRefilled;
+            this.attachedOutput.Buffer.RefilledEvent -= this.bufferRefilled;
             this.OnOutputDetached();
+            this.attachedOutput = null;
         }
 
         protected virtual void OnOutputAttached()
@@ -67,7 +69,8 @@ namespace SDRBlocks.Core
         private void AttachOutput(IStreamOutput output)
         {
             this.DetachOutput();
-            this.attachedOutput = output;
+            this.NotifyOnAttach(output);
+            // Notify the attached entity
             StreamOutputBase co = this.attachedOutput as StreamOutputBase;
             co.NotifyOnAttach(this);
         }
@@ -76,9 +79,10 @@ namespace SDRBlocks.Core
         {
             if (this.attachedOutput != null)
             {
+                // Notify the detached entity
                 StreamOutputBase co = this.attachedOutput as StreamOutputBase;
-                co.NotifyOnDetach(this);
-                this.attachedOutput = null;
+                co.NotifyOnDetach();
+                this.NotifyOnDetach();
             }
         }
     }

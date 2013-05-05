@@ -25,11 +25,12 @@ namespace SDRBlocks.IO.PortAudio
             outputParams.channelCount = (int)this.ChannelCount;
             outputParams.suggestedLatency = 0;
             outputParams.sampleFormat = PortAudioAPI.PaSampleFormat.paFloat32;
-            this.InitializePaStream(null, outputParams, 16384);
+            this.InitializePaStream(null, outputParams, 1024);
         }
 
         protected override void StreamCallback(IntPtr input, IntPtr output, uint frameCount)
         {
+            Console.WriteLine("Output::StreamCallback called.");
             uint frameSize = this.ChannelCount * sizeof(float);
             if (this.Input.AttachedOutput != null)
             {
@@ -37,6 +38,7 @@ namespace SDRBlocks.IO.PortAudio
 
                 uint framesAvailable = buffer.FrameCount;
                 uint framesToCopy = Math.Min(frameCount, framesAvailable);
+                Console.WriteLine("Output::StreamCallback: copying {0} frames.", framesToCopy);
                 MemFuncs.memcpy(output, buffer.Ptr, (UIntPtr)(frameSize * framesToCopy));
                 buffer.Consume(framesToCopy);
 
