@@ -2,31 +2,27 @@
 
 namespace SDRBlocks.Core.DspBlocks
 {
-    public class Oscillator : DspBlockBase
+    public class Oscillator : IDspBlock
     {
-        public Oscillator(uint sampleRate)
-            : this(sampleRate, 0.6667f, 1000.0f)
+        public Oscillator()
+            : this(0.6667f, 1000.0f)
         {
         }
 
-        public Oscillator(uint sampleRate, float amplitude, float freq)
+        public Oscillator(float amplitude, float freq)
         {
-            this.SampleRate = sampleRate;
+            SourcePin output = new SourcePin();
+            output.SignalAttachedEvent += new PinEvent(this.OnOutputSignalAttached);
+            output.ConsumedEvent += new SignalConsumedDelegate(this.OnConsumed);
+
+            this.Output = output;
             this.Amplitude = amplitude;
             this.Frequency = freq;
 
-            StreamOutputSimple iq = new StreamOutputSimple(1, FrameFormat.Complex, sampleRate, 65536);
-            iq.ConsumedEvent += new OutputBufferConsumedDelegate(OnOutputConsumed);
-            this.IQ = iq;
-            this.Outputs.Add(iq);
-
             this.currentAngle = 0.0f;
-            this.Refill();
         }
 
-        public IStreamOutput IQ { get; private set; }
-
-        public uint SampleRate { get; private set; }
+        public ISourcePin Output { get; private set; }
 
         public float Amplitude { get; set; }
 
@@ -39,22 +35,43 @@ namespace SDRBlocks.Core.DspBlocks
             set
             {
                 this.frequency = value;
-                this.sampleStep = value * 2.0 * Math.PI / this.SampleRate;
+                this.UpdateSampleStep();
             }
         }
 
         #region Implementation details
 
-        protected virtual void OnOutputConsumed(IStreamOutput sender)
+        private double currentAngle;
+        private float frequency;
+        private double sampleStep;
+
+        private void OnOutputSignalAttached()
         {
-            this.Refill();
+            this.UpdateSampleStep();
+            this.OnConsumed();
         }
 
-        protected unsafe void Refill()
+        private void OnConsumed()
         {
-            var buffer = this.IQ.Buffer;
-            Complex* data = (Complex*)buffer.Ptr.ToPointer();
-            for (uint i = buffer.FrameCount; i < buffer.Size; ++i)
+            this.RefillIQ();
+        }
+
+        private void UpdateSampleStep()
+        {
+            if (this.Output.AttachedSignal != null)
+            {
+                this.sampleStep = this.Frequency * 2.0 * Math.PI / this.Output.AttachedSignal.FrameRate;
+            }
+        }
+
+        /// <summary>
+        /// Refill the buffer with quadrature signal.
+        /// </summary>
+        private unsafe void RefillIQ()
+        {
+            Signal signal = this.Output.AttachedSignal;
+            Complex* data = (Complex*)signal.Data.ToPointer();
+            for (int i = signal.FrameCount; i < signal.Size; ++i)
             {
                 data[i] = FastMath.SinCos(this.currentAngle) * this.Amplitude;
                 this.currentAngle += this.sampleStep;
@@ -63,12 +80,8 @@ namespace SDRBlocks.Core.DspBlocks
                     this.currentAngle -= FastMath.TWOPI;
                 }
             }
-            buffer.FrameCount = buffer.Size;
+            signal.NotifyOnRefill(signal.Size - signal.FrameCount);
         }
-
-        private double currentAngle;
-        private float frequency;
-        private double sampleStep;
 
         #endregion
     }

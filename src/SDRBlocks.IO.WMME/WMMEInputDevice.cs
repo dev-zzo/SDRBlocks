@@ -1,6 +1,7 @@
 ﻿using System;
 using SDRBlocks.Core;
 using SDRBlocks.IO.WMME.Interop;
+using SDRBlocks.Core.Interop;
 
 namespace SDRBlocks.IO.WMME
 {
@@ -9,12 +10,11 @@ namespace SDRBlocks.IO.WMME
         public WMMEInputDevice(int deviceIndex, uint channels, uint frameRate)
             : base(deviceIndex, channels, frameRate, 3, 2048)
         {
-            uint outputBufferSize = 8 * 2048;
-            this.Output = new StreamOutputSimple(channels, FrameFormat.Float32, frameRate, outputBufferSize);
-            this.Outputs.Add(this.Output);
+            SourcePin output = new SourcePin();
+            this.Output = output;
         }
 
-        public IStreamOutput Output { get; private set; }
+        public ISourcePin Output { get; private set; }
 
         #region Implementation details
 
@@ -39,9 +39,14 @@ namespace SDRBlocks.IO.WMME
 
         protected override void ProcessBuffer(WaveBuffer waveBuffer)
         {
-            if (this.Output.AttachedInput != null)
+            //Console.WriteLine("Input::ProcessBuffer");
+            if (this.Output.IsConnected)
             {
-                this.Output.Buffer.Refill(waveBuffer.Buffer, waveBuffer.Size);
+                Signal signal = this.Output.AttachedSignal;
+                IntPtr dest = signal.Data + signal.FrameCount * signal.FrameSize;
+                int framesToCopy = Math.Min((int)waveBuffer.Size, signal.Size - signal.FrameCount);
+                MemFuncs.memcpy(dest, waveBuffer.Buffer, (UIntPtr)(framesToCopy * signal.FrameSize));
+                signal.NotifyOnRefill(framesToCopy);
             }
 
             waveBuffer.Submit();

@@ -12,6 +12,6 @@ namespace SDRBlocks.Core.IO
     {
         IDeviceEnumerator Enumerator { get; }
 
-        IStreamOutput CreateInputDevice(string id, uint channels, uint sampleRate);
+        IDspBlock CreateInputDevice(string id, uint channels, uint sampleRate);
     }
 }

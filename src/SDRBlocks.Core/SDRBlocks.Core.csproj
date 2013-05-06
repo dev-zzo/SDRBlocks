@@ -40,29 +40,22 @@
     <Compile Include="FastMath.cs" />
     <Compile Include="FrameFormat.cs" />
     <Compile Include="Complex.cs" />
-    <Compile Include="DataChunk.cs" />
-    <Compile Include="DspBlockBase.cs" />
     <Compile Include="IDspBlock.cs" />
     <Compile Include="Interop\MemFuncs.cs" />
     <Compile Include="IO\DeviceInformation.cs" />
     <Compile Include="IO\IDeviceEnumerator.cs" />
     <Compile Include="IO\IModuleIO.cs" />
-    <Compile Include="IProcessor.cs" />
-    <Compile Include="IRefCounted.cs" />
-    <Compile Include="IStreamInput.cs" />
-    <Compile Include="IStreamOutput.cs" />
+    <Compile Include="IPin.cs" />
+    <Compile Include="ISinkPin.cs" />
+    <Compile Include="ISourcePin.cs" />
+    <Compile Include="Pin.cs" />
     <Compile Include="Processing\IProcessingItem.cs" />
     <Compile Include="Processing\ProcessingPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FrameBuffer.cs" />
     <Compile Include="SDRBlocksException.cs" />
-    <Compile Include="StreamInputBase.cs" />
-    <Compile Include="StreamInputSimple.cs" />
-    <Compile Include="StreamOutputBase.cs" />
-    <Compile Include="StreamOutputSimple.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="ReadMe.txt" />
+    <Compile Include="Signal.cs" />
+    <Compile Include="SinkPin.cs" />
+    <Compile Include="SourcePin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

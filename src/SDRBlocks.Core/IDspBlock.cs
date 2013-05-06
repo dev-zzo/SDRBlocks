@@ -3,10 +3,7 @@ using System.Collections.Generic;
 
 namespace SDRBlocks.Core
 {
-    public interface IDspBlock : IDisposable
+    public interface IDspBlock
     {
-        IList<IStreamInput> Inputs { get; }
-
-        IList<IStreamOutput> Outputs { get; }
     }
 }

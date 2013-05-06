@@ -10,11 +10,11 @@ namespace SDRBlocks.IO.WMME
         public WMMEOutputDevice(int deviceIndex, uint channels, uint frameRate)
             : base(deviceIndex, channels, frameRate, 3, 1024)
         {
-            this.Input = new StreamInputSimple();
-            this.Inputs.Add(this.Input);
+            SinkPin input = new SinkPin();
+            this.Input = input;
         }
 
-        public IStreamInput Input { get; private set; }
+        public ISinkPin Input { get; private set; }
 
         #region Implementation details
 
@@ -38,22 +38,18 @@ namespace SDRBlocks.IO.WMME
 
         protected override void ProcessBuffer(WaveBuffer waveBuffer)
         {
-            uint frameCount = waveBuffer.Size;
+            int frameCount = (int)waveBuffer.Size;
+            //Console.WriteLine("Output::ProcessBuffer");
 
-            if (this.Input.AttachedOutput != null)
+            if (this.Input.IsConnected)
             {
-                FrameBuffer frameBuffer = this.Input.AttachedOutput.Buffer;
-
-                uint framesAvailable = frameBuffer.FrameCount;
-                uint framesToCopy = Math.Min(frameCount, framesAvailable);
-                MemFuncs.memcpy(waveBuffer.Buffer, frameBuffer.Ptr, (UIntPtr)(this.FrameSize * framesToCopy));
-                frameBuffer.Consume(framesToCopy);
-
-                if (framesToCopy < frameCount)
+                Signal signal = this.Input.AttachedSignal;
+                if (signal.FrameCount > 4 * frameCount)
                 {
-                    uint framesToZero = frameCount - framesToCopy;
-                    IntPtr ptr = frameBuffer.Ptr + (int)(this.FrameSize * framesToCopy);
-                    MemFuncs.memset(ptr, 0, (UIntPtr)(this.FrameSize * framesToZero));
+                    int framesAvailable = signal.FrameCount;
+                    int framesToCopy = Math.Min(frameCount, framesAvailable);
+                    MemFuncs.memcpy(waveBuffer.Buffer, signal.Data, (UIntPtr)(this.FrameSize * framesToCopy));
+                    signal.NotifyOnConsume(framesToCopy);
                 }
             }
             else

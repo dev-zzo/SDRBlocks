@@ -10,14 +10,14 @@ namespace SDRBlocks.Core
 
     public static class FrameFormatExtensions
     {
-        public static uint Size(this FrameFormat ff)
+        public static int Size(this FrameFormat ff)
         {
             switch (ff)
             {
                 case FrameFormat.Float32:
                     return sizeof(float);
                 case FrameFormat.Complex:
-                    return (uint)Marshal.SizeOf(typeof(Complex));
+                    return Marshal.SizeOf(typeof(Complex));
                 default:
                     throw new SDRBlocksException("Invalid enumeration value");
             }

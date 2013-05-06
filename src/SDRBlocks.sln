@@ -5,11 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDRBlocks", "SDRBlocks\SDRB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDRBlocks.Core", "SDRBlocks.Core\SDRBlocks.Core.csproj", "{A69C1399-C4B8-428D-8C58-8D5370F3482F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDRBlocks.IO.PortAudio", "SDRBlocks.IO.PortAudio\SDRBlocks.IO.PortAudio.csproj", "{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}"
-	ProjectSection(ProjectDependencies) = postProject
-		{0A18A071-125E-442F-AFF7-A3F68ABECF99} = {0A18A071-125E-442F-AFF7-A3F68ABECF99}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDRBlocks.Tester", "SDRBlocks.Tester\SDRBlocks.Tester.csproj", "{B313D395-7118-4BB1-9A00-7B0463CECBAF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0A18A071-125E-442F-AFF7-A3F68ABECF99} = {0A18A071-125E-442F-AFF7-A3F68ABECF99}
@@ -80,27 +75,6 @@ Global
 		{A69C1399-C4B8-428D-8C58-8D5370F3482F}.ReleaseMinDependency|Win32.ActiveCfg = Release|Any CPU
 		{A69C1399-C4B8-428D-8C58-8D5370F3482F}.ReleaseMinDependency|x64.ActiveCfg = Release|Any CPU
 		{A69C1399-C4B8-428D-8C58-8D5370F3482F}.ReleaseMinDependency|x86.ActiveCfg = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Release|Win32.ActiveCfg = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Release|x64.ActiveCfg = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.Release|x86.ActiveCfg = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.ReleaseMinDependency|Any CPU.ActiveCfg = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.ReleaseMinDependency|Any CPU.Build.0 = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.ReleaseMinDependency|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.ReleaseMinDependency|Mixed Platforms.Build.0 = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.ReleaseMinDependency|Win32.ActiveCfg = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.ReleaseMinDependency|x64.ActiveCfg = Release|Any CPU
-		{C5EC45E2-2EA2-470E-99FB-0466AEE4A5E6}.ReleaseMinDependency|x86.ActiveCfg = Release|Any CPU
 		{B313D395-7118-4BB1-9A00-7B0463CECBAF}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{B313D395-7118-4BB1-9A00-7B0463CECBAF}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{B313D395-7118-4BB1-9A00-7B0463CECBAF}.Debug|Mixed Platforms.Build.0 = Debug|x86

@@ -2,6 +2,7 @@
 using System.Threading;
 using SDRBlocks.Core.DspBlocks;
 using SDRBlocks.IO.WMME;
+using SDRBlocks.Core;
 
 namespace SDRBlocks.Tester
 {
@@ -37,9 +38,15 @@ namespace SDRBlocks.Tester
             }
 
             var input = new WMMEInputDevice(0, 2, 44100);
+            var osc = new Oscillator(1f, 440.0f);
             var output = new WMMEOutputDevice(0, 2, 44100);
-            input.Output.AttachedInput = output.Input;
+            Signal signal = new Signal(44100, 2, FrameFormat.Float32, 44100);
+            input.Output.AttachedSignal = signal;
+            //osc.Output.AttachedSignal = signal;
+            output.Input.AttachedSignal = signal;
+
             Thread.Sleep(15000);
+
             input.Dispose();
             output.Dispose();
         }

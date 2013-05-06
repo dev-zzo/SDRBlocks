@@ -5,7 +5,7 @@ using SDRBlocks.IO.WMME.Interop;
 
 namespace SDRBlocks.IO.WMME
 {
-    public abstract class WMMEAudioDevice : DspBlockBase
+    public abstract class WMMEAudioDevice : IDspBlock, IDisposable
     {
         public WMMEAudioDevice(int deviceIndex, uint channels, uint frameRate, uint bufferCount, uint framesPerBuffer)
         {
@@ -24,6 +24,12 @@ namespace SDRBlocks.IO.WMME
         public uint FrameRate { get; private set; }
 
         public uint ChannelCount { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         #region Implementation details
 
@@ -66,12 +72,18 @@ namespace SDRBlocks.IO.WMME
             }
         }
 
-        protected override void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            this.Close();
-            base.Dispose(disposing);
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    this.Close();
+                }
+            }
         }
 
+        private bool disposed;
         private readonly Thread bufferPumpThread;
 
         private void CreateBuffers(uint bufferCount, uint framesPerBuffer, uint frameSize)
