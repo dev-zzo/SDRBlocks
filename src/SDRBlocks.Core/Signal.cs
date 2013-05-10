@@ -126,7 +126,6 @@ namespace SDRBlocks.Core
         /// <param name="frameCount">How many frames have been consumed.</param>
         public void NotifyOnConsume(int frameCount)
         {
-            //Console.WriteLine("Signal::NotifyOnConsume: {0} frames.", frameCount);
             this.MoveData(frameCount);
             this.FrameCount -= frameCount;
             if (this.ConsumedEvent != null)
@@ -141,7 +140,6 @@ namespace SDRBlocks.Core
         /// <param name="frameCount"></param>
         public void NotifyOnRefill(int frameCount)
         {
-            //Console.WriteLine("Signal::NotifyOnRefill: {0} frames.", frameCount);
             this.FrameCount += frameCount;
             if (this.RefilledEvent != null)
             {
@@ -171,7 +169,7 @@ namespace SDRBlocks.Core
         {
             IntPtr src = this.data + frameCount * this.FrameSize;
             // NOTE: Potentially use this.FrameCount to decrease amount of data moved.
-            MemFuncs.memmove(this.data, src, (UIntPtr)((this.Size - frameCount) * this.FrameSize));
+            MemFuncs.MemMove(this.data, src, (UIntPtr)((this.Size - frameCount) * this.FrameSize));
         }
     }
 }

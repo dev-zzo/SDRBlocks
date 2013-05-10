@@ -48,6 +48,7 @@
     <Compile Include="IPin.cs" />
     <Compile Include="ISinkPin.cs" />
     <Compile Include="ISourcePin.cs" />
+    <Compile Include="Maths\Fourier.cs" />
     <Compile Include="Pin.cs" />
     <Compile Include="Processing\IProcessingItem.cs" />
     <Compile Include="Processing\ProcessingPool.cs" />

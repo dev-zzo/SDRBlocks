@@ -39,13 +39,12 @@ namespace SDRBlocks.IO.WMME
 
         protected override void ProcessBuffer(WaveBuffer waveBuffer)
         {
-            //Console.WriteLine("Input::ProcessBuffer");
             if (this.Output.IsConnected)
             {
                 Signal signal = this.Output.AttachedSignal;
                 IntPtr dest = signal.Data + signal.FrameCount * signal.FrameSize;
                 int framesToCopy = Math.Min((int)waveBuffer.Size, signal.Size - signal.FrameCount);
-                MemFuncs.memcpy(dest, waveBuffer.Buffer, (UIntPtr)(framesToCopy * signal.FrameSize));
+                MemFuncs.MemCopy(dest, waveBuffer.Buffer, (UIntPtr)(framesToCopy * signal.FrameSize));
                 signal.NotifyOnRefill(framesToCopy);
             }
 

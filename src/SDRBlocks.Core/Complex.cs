@@ -18,7 +18,7 @@ namespace SDRBlocks.Core
             this.Im = im;
         }
 
-        #region "Operators"
+        #region Operators
 
         public static Complex operator +(Complex lhs, Complex rhs)
         {
@@ -75,7 +75,7 @@ namespace SDRBlocks.Core
 
         public float Mod()
         {
-            return (float) Math.Sqrt(ModSq());
+            return (float)Math.Sqrt(ModSq());
         }
 
         /// <summary>
@@ -87,9 +87,14 @@ namespace SDRBlocks.Core
             return this.Re * this.Re + this.Im * this.Im;
         }
 
+        public float Arg()
+        {
+            return (float)Math.Atan2(this.Im, this.Re);
+        }
+
         public override string ToString()
         {
-            return String.Format("{{{0},{1}}}", this.Re, this.Im);
+            return String.Format("{{{0},{1}j}}", this.Re, this.Im);
         }
     }
 }
