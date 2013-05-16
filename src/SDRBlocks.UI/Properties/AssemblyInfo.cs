@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SDRBlocks")]
+[assembly: AssemblyTitle("SDRBlocks.UI")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Across")]
-[assembly: AssemblyProduct("SDRBlocks")]
+[assembly: AssemblyProduct("SDRBlocks.UI")]
 [assembly: AssemblyCopyright("Copyright © Across 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("bd94b2f6-9e8e-4b27-b028-6b62dc4a81e1")]
+[assembly: Guid("e36a6c64-0fb5-40b4-8c51-bc7c23692d8c")]
 
 // Version information for an assembly consists of the following four values:
 //
