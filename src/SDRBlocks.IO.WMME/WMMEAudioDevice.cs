@@ -80,6 +80,7 @@ namespace SDRBlocks.IO.WMME
                 {
                     this.Close();
                 }
+                this.disposed = true;
             }
         }
 

@@ -13,6 +13,11 @@ namespace SDRBlocks.Core.IO
         /// <summary>
         /// RX center frequency.
         /// </summary>
-        public long CenterFrequency { get; set; }
+        long CenterFrequency { get; set; }
+
+        /// <summary>
+        /// Frequency correction, ppm.
+        /// </summary>
+        int CorrectionCoefficient { get; set; }
     }
 }

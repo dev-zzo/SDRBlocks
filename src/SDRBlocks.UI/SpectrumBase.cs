@@ -91,7 +91,7 @@ namespace SDRBlocks.UI
 
             // Cause the foreground to be redrawn
             this.InvalidateForeground();
-            this.Refresh();
+            this.RefreshBitmaps();
         }
 
         #endregion
@@ -130,7 +130,7 @@ namespace SDRBlocks.UI
                 this.DisposeBuffers();
                 this.AllocateBuffers();
                 this.InvalidateBackground();
-                this.Refresh();
+                this.RefreshBitmaps();
             }
         }
 
@@ -191,7 +191,7 @@ namespace SDRBlocks.UI
             this.foregroundInvalid = true;
         }
 
-        protected void Refresh()
+        protected void RefreshBitmaps()
         {
             if (this.backgroundInvalid)
             {

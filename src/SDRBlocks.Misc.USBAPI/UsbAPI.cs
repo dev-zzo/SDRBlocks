@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.IO;
+using SDRBlocks.Misc.USBAPI.Interop;
+using Microsoft.Win32.SafeHandles;
 
 namespace SDRBlocks.Misc.USBAPI
 {
-    public delegate void EnumerateHidDevicesDelegate(IntPtr hDevInfo, ref SpDevInfoData devInfoData, string deviceInstanceId);
+    public delegate void EnumerateHidDevicesDelegate(IntPtr hDevInfo, SpDevInfoData devInfoData, string deviceInstanceId);
 
     public static class UsbAPI
     {
@@ -32,19 +35,19 @@ namespace SDRBlocks.Misc.USBAPI
                     sb,
                     bufferSize,
                     out bufferSize);
-                cb(hDevInfo, ref deviceInfoData, sb.ToString());
+                cb(hDevInfo, deviceInfoData, sb.ToString().ToUpper());
             }
 
             SetupAPI.SetupDiDestroyDeviceInfoList(hDevInfo);
         }
 
         /// <summary>
-        /// Obtain the device interface path for the given device.
+        /// Open the specific device.
         /// </summary>
         /// <param name="hDevInfo"></param>
         /// <param name="devInfoData"></param>
         /// <returns></returns>
-        public static string GetHidDevicePath(IntPtr hDevInfo, ref SpDevInfoData devInfoData)
+        public static FileStream OpenHidDevice(IntPtr hDevInfo, ref SpDevInfoData devInfoData)
         {
             Guid guid;
             SetupAPI.HidD_GetHidGuid(out guid);
@@ -77,7 +80,17 @@ namespace SDRBlocks.Misc.USBAPI
                 IntPtr.Zero,
                 IntPtr.Zero);
 
-            return interfaceDetail.DevicePath;
+            IntPtr unsafeHandle = Kernel32.CreateFile(
+                interfaceDetail.DevicePath,
+                Kernel32.GENERIC_READ | Kernel32.GENERIC_WRITE,
+                Kernel32.FILE_SHARE_READ | Kernel32.FILE_SHARE_WRITE,
+                IntPtr.Zero,
+                Kernel32.OPEN_EXISTING,
+                0,
+                IntPtr.Zero);
+            return new FileStream(new SafeFileHandle(unsafeHandle, true), FileAccess.ReadWrite);
         }
+
+        
     }
 }

@@ -15,7 +15,7 @@ namespace SDRBlocks.UI
             this.AxisMargin = 25;
             this.DisplayRange = 80;
             this.DisplayOffset = 0;
-            this.Refresh();
+            this.RefreshBitmaps();
         }
 
         #region SpectrumBase overrides

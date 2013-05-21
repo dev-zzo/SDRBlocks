@@ -4,7 +4,6 @@ namespace SDRBlocks.IO.FunCubeDongle
     internal enum FunCubeDongleCommand
     {
         Query = 1,
-        SetFrequency = 100,
         SetFrequencyHertz = 101,
         GetFrequencyHertz = 102,
         SetLNAGain = 110,

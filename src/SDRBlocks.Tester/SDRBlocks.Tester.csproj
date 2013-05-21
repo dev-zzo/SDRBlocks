@@ -45,6 +45,10 @@
       <Project>{A69C1399-C4B8-428D-8C58-8D5370F3482F}</Project>
       <Name>SDRBlocks.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SDRBlocks.IO.FunCubeDongle\SDRBlocks.IO.FunCubeDongle.csproj">
+      <Project>{03DB364B-ADB1-4EB1-B503-17576DC2CA62}</Project>
+      <Name>SDRBlocks.IO.FunCubeDongle</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SDRBlocks.IO.WMME\SDRBlocks.IO.WMME.csproj">
       <Project>{34560B8F-4BE4-478B-A5BC-AA168832F09B}</Project>
       <Name>SDRBlocks.IO.WMME</Name>

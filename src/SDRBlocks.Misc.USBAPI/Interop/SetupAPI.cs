@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
+using System.Text;
 
-namespace SDRBlocks.Misc.USBAPI
+namespace SDRBlocks.Misc.USBAPI.Interop
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct SpDevInfoData
