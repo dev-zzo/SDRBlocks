@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace SDRBlocks.Core
+namespace SDRBlocks.Core.Maths
 {
     /// <summary>
     /// Implements a classic complex data type.
@@ -11,6 +11,8 @@ namespace SDRBlocks.Core
     {
         public float Re;
         public float Im;
+
+        public static Complex Zero = new Complex(0.0f, 0.0f);
 
         public Complex(float re, float im)
         {

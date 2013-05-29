@@ -10,11 +10,15 @@ namespace SDRBlocks.IO.WMME
         public WMMEInputDevice(int deviceIndex, uint channels, uint frameRate)
             : base(deviceIndex, channels, frameRate, 3, 2048)
         {
-            SourcePin output = new SourcePin();
-            this.Output = output;
+            this.Output = new SourcePin();
         }
 
-        public ISourcePin Output { get; private set; }
+        public SourcePin Output { get; private set; }
+
+        public override bool IsIndependent
+        {
+            get { return true; }
+        }
 
         #region Implementation details
 
@@ -49,6 +53,7 @@ namespace SDRBlocks.IO.WMME
             }
 
             waveBuffer.Submit();
+            this.InvokeProcessTrigger();
         }
 
         protected override void Close()

@@ -4,10 +4,6 @@ using SDRBlocks.Core.Interop;
 
 namespace SDRBlocks.Core
 {
-    public delegate void SignalRefilledDelegate();
-
-    public delegate void SignalConsumedDelegate();
-
     /// <summary>
     /// A signal is what connects two pins.
     /// Basically, this is a buffer to hold the data.
@@ -30,16 +26,22 @@ namespace SDRBlocks.Core
             this.data = this.backBufferHandle.AddrOfPinnedObject();
         }
 
+        #region Public properties
+
+        /// <summary>
+        /// Human-readable signal name.
+        /// </summary>
         public string Name { get; set; }
 
+        public SourcePin SourcePin { get; private set; }
 
-        public ISourcePin SourcePin { get; private set; }
-
-        public ISinkPin SinkPin { get; private set; }
+        public SinkPin SinkPin { get; private set; }
 
         public bool IsConnected { get { return this.SourcePin != null && this.SinkPin != null; } }
 
-
+        /// <summary>
+        /// Frame rate of this signal, samples/s.
+        /// </summary>
         public int FrameRate { get; private set; }
 
         /// <summary>
@@ -72,53 +74,7 @@ namespace SDRBlocks.Core
         /// </summary>
         public int Size { get; private set; }
 
-
-        public event SignalRefilledDelegate RefilledEvent;
-
-        public event SignalConsumedDelegate ConsumedEvent;
-
-
-        internal void NotifyOnAttach(IPin pin)
-        {
-            ISourcePin source = pin as ISourcePin;
-            if (source != null)
-            {
-                if (this.SourcePin != null)
-                {
-                }
-                this.SourcePin = source;
-                return;
-            }
-
-            ISinkPin sink = pin as ISinkPin;
-            if (sink != null)
-            {
-                if (this.SinkPin != null)
-                {
-                }
-                this.SinkPin = sink;
-                return;
-            }
-            throw new SDRBlocksException("Unknown IPin impementation.");
-        }
-
-        internal void NotifyOnDetach(IPin pin)
-        {
-            ISourcePin source = pin as ISourcePin;
-            if (source != null)
-            {
-                this.SourcePin = null;
-                return;
-            }
-
-            ISinkPin sink = pin as ISinkPin;
-            if (sink != null)
-            {
-                this.SinkPin = null;
-                return;
-            }
-            throw new SDRBlocksException("Unknown IPin impementation.");
-        }
+        #endregion
 
         /// <summary>
         /// Called by a sink pin's owner when data has been consumed.
@@ -128,10 +84,6 @@ namespace SDRBlocks.Core
         {
             this.MoveData(frameCount);
             this.FrameCount -= frameCount;
-            if (this.ConsumedEvent != null)
-            {
-                this.ConsumedEvent();
-            }
         }
 
         /// <summary>
@@ -141,10 +93,6 @@ namespace SDRBlocks.Core
         public void NotifyOnRefill(int frameCount)
         {
             this.FrameCount += frameCount;
-            if (this.RefilledEvent != null)
-            {
-                this.RefilledEvent();
-            }
         }
 
         #region IDisposable Members

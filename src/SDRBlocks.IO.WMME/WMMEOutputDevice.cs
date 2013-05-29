@@ -14,7 +14,12 @@ namespace SDRBlocks.IO.WMME
             this.Input = input;
         }
 
-        public ISinkPin Input { get; private set; }
+        public SinkPin Input { get; private set; }
+
+        public override bool IsIndependent
+        {
+            get { return false; }
+        }
 
         #region Implementation details
 
@@ -57,6 +62,7 @@ namespace SDRBlocks.IO.WMME
             }
 
             waveBuffer.Submit();
+            this.InvokeProcessTrigger();
         }
 
         protected override void Close()

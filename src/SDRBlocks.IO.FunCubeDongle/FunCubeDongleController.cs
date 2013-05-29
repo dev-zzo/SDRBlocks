@@ -237,30 +237,38 @@ namespace SDRBlocks.IO.FunCubeDongle
             this.deviceStream.Write(buffer, 0, buffer.Length);
         }
 
+        private void ReadCheckResponse(byte[] buffer)
+        {
+            this.deviceStream.Read(buffer, 0, 65);
+            if (buffer[2] != 1)
+            {
+                // TODO: throw a new exception here?
+            }
+        }
+
         private void ReadResponse()
         {
-            byte[] buffer = new byte[65];
-            this.deviceStream.Read(buffer, 0, buffer.Length);
+            this.ReadCheckResponse(new byte[65]);
         }
 
         private void ReadResponse(out bool result)
         {
             byte[] buffer = new byte[65];
-            this.deviceStream.Read(buffer, 0, buffer.Length);
+            this.ReadCheckResponse(buffer);
             result = buffer[3] == 1;
         }
 
         private void ReadResponse(out byte result)
         {
             byte[] buffer = new byte[65];
-            this.deviceStream.Read(buffer, 0, buffer.Length);
+            this.ReadCheckResponse(buffer);
             result = buffer[3];
         }
 
         private void ReadResponse(out uint result)
         {
             byte[] buffer = new byte[65];
-            this.deviceStream.Read(buffer, 0, buffer.Length);
+            this.ReadCheckResponse(buffer);
             result = BitConverter.ToUInt32(buffer, 3);
         }
 

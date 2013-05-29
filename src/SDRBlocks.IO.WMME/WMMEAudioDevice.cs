@@ -5,7 +5,7 @@ using SDRBlocks.IO.WMME.Interop;
 
 namespace SDRBlocks.IO.WMME
 {
-    public abstract class WMMEAudioDevice : IDspBlock, IDisposable
+    public abstract class WMMEAudioDevice : IDspBlock, IProcessTrigger, IDisposable
     {
         public WMMEAudioDevice(int deviceIndex, uint channels, uint frameRate, uint bufferCount, uint framesPerBuffer)
         {
@@ -31,6 +31,22 @@ namespace SDRBlocks.IO.WMME
             GC.SuppressFinalize(this);
         }
 
+        #region IDspBlock implementation
+
+        public abstract bool IsIndependent { get; }
+
+        public void Process()
+        {
+        }
+
+        #endregion
+
+        #region IProcessTrigger implementation
+
+        public event ProcessTriggerDelegate ProcessTriggerEvent;
+
+        #endregion
+
         #region Implementation details
 
         protected uint FrameSize { get { return this.ChannelCount * sizeof(float); } }
@@ -44,6 +60,14 @@ namespace SDRBlocks.IO.WMME
         protected abstract WaveBuffer CreateBuffer(uint numFrames, uint frameSize);
         protected abstract void ProcessBuffer(WaveBuffer waveBuffer);
         protected abstract void Close();
+
+        protected void InvokeProcessTrigger()
+        {
+            if (this.ProcessTriggerEvent != null)
+            {
+                this.ProcessTriggerEvent(this);
+            }
+        }
 
         protected void ReleaseBuffers()
         {

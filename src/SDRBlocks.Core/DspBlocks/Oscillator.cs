@@ -1,4 +1,5 @@
 ﻿using System;
+using SDRBlocks.Core.Maths;
 
 namespace SDRBlocks.Core.DspBlocks
 {
@@ -11,78 +12,48 @@ namespace SDRBlocks.Core.DspBlocks
 
         public Oscillator(float amplitude, float freq)
         {
-            SourcePin output = new SourcePin();
-            output.SignalAttachedEvent += new PinEvent(this.OnOutputSignalAttached);
-            output.ConsumedEvent += new SignalConsumedDelegate(this.OnConsumed);
+            this.Output = new SourcePin();
 
-            this.Output = output;
             this.Amplitude = amplitude;
             this.Frequency = freq;
 
-            this.currentAngle = 0.0f;
+            this.phase = 0.0f;
         }
 
-        public ISourcePin Output { get; private set; }
+        public SourcePin Output { get; private set; }
 
         public float Amplitude { get; set; }
 
-        public float Frequency
+        public float Frequency { get; set; }
+
+        #region IDspBlock members
+
+        public bool IsIndependent
         {
-            get
-            {
-                return this.frequency;
-            }
-            set
-            {
-                this.frequency = value;
-                this.UpdateSampleStep();
-            }
+            get { return true; }
         }
 
-        #region Implementation details
-
-        private double currentAngle;
-        private float frequency;
-        private double sampleStep;
-
-        private void OnOutputSignalAttached()
-        {
-            this.UpdateSampleStep();
-            this.OnConsumed();
-        }
-
-        private void OnConsumed()
-        {
-            this.RefillIQ();
-        }
-
-        private void UpdateSampleStep()
-        {
-            if (this.Output.AttachedSignal != null)
-            {
-                this.sampleStep = this.Frequency * 2.0 * Math.PI / this.Output.AttachedSignal.FrameRate;
-            }
-        }
-
-        /// <summary>
-        /// Refill the buffer with quadrature signal.
-        /// </summary>
-        private unsafe void RefillIQ()
+        public unsafe void Process()
         {
             Signal signal = this.Output.AttachedSignal;
-            Complex* data = (Complex*)signal.Data.ToPointer();
-            for (int i = signal.FrameCount; i < signal.Size; ++i)
+            if (signal != null)
             {
-                data[i] = FastMath.SinCos(this.currentAngle) * this.Amplitude;
-                this.currentAngle += this.sampleStep;
-                while (this.currentAngle > FastMath.TWOPI)
+                Complex* data = (Complex*)signal.Data.ToPointer();
+                double phaseDelta = this.Frequency * 2.0 * Math.PI / this.Output.AttachedSignal.FrameRate;
+                for (int i = signal.FrameCount; i < signal.Size; ++i)
                 {
-                    this.currentAngle -= FastMath.TWOPI;
+                    data[i] = FastMath.SinCos(this.phase) * this.Amplitude;
+                    this.phase += phaseDelta;
+                    while (this.phase > FastMath.TWOPI)
+                    {
+                        this.phase -= FastMath.TWOPI;
+                    }
                 }
             }
-            signal.NotifyOnRefill(signal.Size - signal.FrameCount);
         }
 
         #endregion
+
+        private double phase;
     }
 }

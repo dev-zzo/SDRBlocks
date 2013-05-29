@@ -36,20 +36,23 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DspBlocks\FmDetector.cs" />
     <Compile Include="DspBlocks\Oscillator.cs" />
-    <Compile Include="FastMath.cs" />
+    <Compile Include="DspProcessor.cs" />
+    <Compile Include="IProcessTrigger.cs" />
+    <Compile Include="Maths\FastMath.cs" />
     <Compile Include="FrameFormat.cs" />
-    <Compile Include="Complex.cs" />
+    <Compile Include="Maths\Complex.cs" />
     <Compile Include="IDspBlock.cs" />
     <Compile Include="Interop\MemFuncs.cs" />
     <Compile Include="IO\DeviceInformation.cs" />
     <Compile Include="IO\IDeviceController.cs" />
     <Compile Include="IO\IDeviceEnumerator.cs" />
     <Compile Include="IO\IModuleIO.cs" />
-    <Compile Include="IPin.cs" />
-    <Compile Include="ISinkPin.cs" />
-    <Compile Include="ISourcePin.cs" />
+    <Compile Include="Maths\Convolution.cs" />
+    <Compile Include="Maths\FilterHelper.cs" />
     <Compile Include="Maths\Fourier.cs" />
+    <Compile Include="Maths\Resample.cs" />
     <Compile Include="Pin.cs" />
     <Compile Include="Processing\IProcessingItem.cs" />
     <Compile Include="Processing\ProcessingPool.cs" />
