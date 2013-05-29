@@ -12,24 +12,7 @@ namespace SDRBlocks.Core
         /// <summary>
         /// Access the attached signal.
         /// </summary>
-        public Signal AttachedSignal
-        {
-            get
-            {
-                return this.attachedSignal;
-            }
-            set
-            {
-                if (value != null)
-                {
-                    this.AttachSignal(value);
-                }
-                else
-                {
-                    this.DetachSignal();
-                }
-            }
-        }
+        public Signal AttachedSignal { get; set; }
 
         /// <summary>
         /// Whether another block is attached (via a signal) to this pin.
@@ -41,22 +24,5 @@ namespace SDRBlocks.Core
         /// Should be of no use outside of the core module.
         /// </summary>
         internal IDspBlock Owner { get; private set; }
-
-        #region Implementation details
-
-        private Signal attachedSignal;
-
-        private void AttachSignal(Signal signal)
-        {
-            this.DetachSignal();
-            this.attachedSignal = signal;
-        }
-
-        private void DetachSignal()
-        {
-            this.attachedSignal = null;
-        }
-
-        #endregion
     }
 }
