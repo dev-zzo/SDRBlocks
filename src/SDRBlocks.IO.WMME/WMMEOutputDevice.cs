@@ -10,8 +10,7 @@ namespace SDRBlocks.IO.WMME
         public WMMEOutputDevice(int deviceIndex, uint channels, uint frameRate)
             : base(deviceIndex, channels, frameRate, 3, 1024)
         {
-            SinkPin input = new SinkPin();
-            this.Input = input;
+            this.Input = new SinkPin(this);
         }
 
         public SinkPin Input { get; private set; }

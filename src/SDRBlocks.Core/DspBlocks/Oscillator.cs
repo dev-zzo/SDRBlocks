@@ -12,7 +12,7 @@ namespace SDRBlocks.Core.DspBlocks
 
         public Oscillator(float amplitude, float freq)
         {
-            this.Output = new SourcePin();
+            this.Output = new SourcePin(this);
 
             this.Amplitude = amplitude;
             this.Frequency = freq;
@@ -29,6 +29,11 @@ namespace SDRBlocks.Core.DspBlocks
         #region IDspBlock members
 
         public bool IsIndependent
+        {
+            get { return true; }
+        }
+
+        public bool IsReadyToProcess
         {
             get { return true; }
         }

@@ -17,7 +17,7 @@ namespace SDRBlocks.Core
         /// True if the block can be scheduled for processing (i.e., all inputs can be consumed).
         /// Used to properly schedule jobs.
         /// </summary>
-        bool CanProcess { get; }
+        bool IsReadyToProcess { get; }
 
         /// <summary>
         /// Perform the actual signal processing.

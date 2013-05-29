@@ -14,6 +14,12 @@ namespace SDRBlocks.Core.DspBlocks
 
         public bool IsIndependent { get { return false; } }
 
+        public bool IsReadyToProcess
+        {
+            // TBD...
+            get { return true; }
+        }
+
         public void Process()
         {
         }

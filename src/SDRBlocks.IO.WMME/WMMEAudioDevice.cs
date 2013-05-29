@@ -35,6 +35,12 @@ namespace SDRBlocks.IO.WMME
 
         public abstract bool IsIndependent { get; }
 
+        public bool IsReadyToProcess
+        {
+            // This is always false since there is no actual processing to be done.
+            get { return false; }
+        }
+
         public void Process()
         {
         }

@@ -4,8 +4,14 @@ namespace SDRBlocks.Core
 {
     public abstract class Pin
     {
-        #region IPin Members
+        public Pin(IDspBlock owner)
+        {
+            this.Owner = owner;
+        }
 
+        /// <summary>
+        /// Access the attached signal.
+        /// </summary>
         public Signal AttachedSignal
         {
             get
@@ -25,9 +31,18 @@ namespace SDRBlocks.Core
             }
         }
 
+        /// <summary>
+        /// Whether another block is attached (via a signal) to this pin.
+        /// </summary>
         public bool IsConnected { get { return this.AttachedSignal != null && this.AttachedSignal.IsConnected; } }
 
-        #endregion
+        /// <summary>
+        /// Which block owns this pin.
+        /// Should be of no use outside of the core module.
+        /// </summary>
+        internal IDspBlock Owner { get; private set; }
+
+        #region Implementation details
 
         private Signal attachedSignal;
 
@@ -41,5 +56,7 @@ namespace SDRBlocks.Core
         {
             this.attachedSignal = null;
         }
+
+        #endregion
     }
 }

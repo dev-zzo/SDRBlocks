@@ -10,7 +10,7 @@ namespace SDRBlocks.IO.WMME
         public WMMEInputDevice(int deviceIndex, uint channels, uint frameRate)
             : base(deviceIndex, channels, frameRate, 3, 2048)
         {
-            this.Output = new SourcePin();
+            this.Output = new SourcePin(this);
         }
 
         public SourcePin Output { get; private set; }
