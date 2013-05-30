@@ -40,19 +40,18 @@ namespace SDRBlocks.Core.DspBlocks
 
         public unsafe void Process()
         {
+            if (!this.Output.IsConnected)
+                return;
             Signal signal = this.Output.AttachedSignal;
-            if (signal != null)
+            Complex* data = (Complex*)signal.Data.ToPointer();
+            double phaseDelta = this.Frequency * 2.0 * Math.PI / this.Output.AttachedSignal.FrameRate;
+            for (int i = signal.FrameCount; i < signal.Size; ++i)
             {
-                Complex* data = (Complex*)signal.Data.ToPointer();
-                double phaseDelta = this.Frequency * 2.0 * Math.PI / this.Output.AttachedSignal.FrameRate;
-                for (int i = signal.FrameCount; i < signal.Size; ++i)
+                data[i] = FastMath.SinCos(this.phase) * this.Amplitude;
+                this.phase += phaseDelta;
+                while (this.phase > FastMath.TWOPI)
                 {
-                    data[i] = FastMath.SinCos(this.phase) * this.Amplitude;
-                    this.phase += phaseDelta;
-                    while (this.phase > FastMath.TWOPI)
-                    {
-                        this.phase -= FastMath.TWOPI;
-                    }
+                    this.phase -= FastMath.TWOPI;
                 }
             }
         }

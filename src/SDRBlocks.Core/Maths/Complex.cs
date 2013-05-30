@@ -5,6 +5,7 @@ namespace SDRBlocks.Core.Maths
 {
     /// <summary>
     /// Implements a classic complex data type.
+    /// It could've been made immutable, but there's no real reason to do so atm.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct Complex
@@ -13,6 +14,8 @@ namespace SDRBlocks.Core.Maths
         public float Im;
 
         public static Complex Zero = new Complex(0.0f, 0.0f);
+        public static Complex RealOne = new Complex(1.0f, 0.0f);
+        public static Complex ImagOne = new Complex(0.0f, 1.0f);
 
         public Complex(float re, float im)
         {
@@ -75,13 +78,17 @@ namespace SDRBlocks.Core.Maths
 
         #endregion
 
+        /// <summary>
+        /// Take modulus of this complex number.
+        /// </summary>
+        /// <returns></returns>
         public float Mod()
         {
-            return (float)Math.Sqrt(ModSq());
+            return (float)Math.Sqrt(this.ModSq());
         }
 
         /// <summary>
-        /// Modulus squared.
+        /// Modulus squared (quite faster).
         /// </summary>
         /// <returns></returns>
         public float ModSq()
@@ -89,9 +96,28 @@ namespace SDRBlocks.Core.Maths
             return this.Re * this.Re + this.Im * this.Im;
         }
 
+        /// <summary>
+        /// Take argument of this complex number.
+        /// </summary>
+        /// <returns></returns>
         public float Arg()
         {
+            // TODO: Optimize this. Atan2 takes double's and is slow.
             return (float)Math.Atan2(this.Im, this.Re);
+        }
+
+        /// <summary>
+        /// Returns the normalized value.
+        /// </summary>
+        /// <returns></returns>
+        public Complex Normalize()
+        {
+            float norm = this.Mod();
+            if (norm > 1e-10)
+            {
+                return this / norm;
+            }
+            return Zero;
         }
 
         public override string ToString()

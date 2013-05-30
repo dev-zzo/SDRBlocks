@@ -74,8 +74,9 @@ namespace SDRBlocks.Core
         /// <summary>
         /// Iterate over the signal graph and ask each block to perform the processing.
         /// </summary>
-        public void StartProcessing()
+        public void StartProcessing(object sender)
         {
+            Console.WriteLine("Processing triggered.");
             foreach (IDspBlock block in this.indepBlocks)
             {
                 ProcessingPool.EnqueueTask(new DspBlockProcessingItem(block));
