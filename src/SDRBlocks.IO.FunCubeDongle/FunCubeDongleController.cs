@@ -2,6 +2,7 @@
 using System.IO;
 using SDRBlocks.Core.IO;
 using SDRBlocks.Misc.USBAPI;
+using SDRBlocks.Core;
 
 namespace SDRBlocks.IO.FunCubeDongle
 {
@@ -36,6 +37,9 @@ namespace SDRBlocks.IO.FunCubeDongle
     {
         public FunCubeDongleController()
         {
+            this.correction = 1.0;
+            this.corrCoefficient = 0;
+
             UsbAPI.EnumerateHidDevices((hDevInfo, devInfoData, deviceInstanceId) =>
             {
                 if (deviceInstanceId.Contains("VID_04D8&PID_FB31"))
@@ -43,6 +47,10 @@ namespace SDRBlocks.IO.FunCubeDongle
                     this.deviceStream = UsbAPI.OpenHidDevice(hDevInfo, ref devInfoData);
                 }
             });
+            if (this.deviceStream == null)
+            {
+                throw new SDRBlocksException("No FunCube device has been found.");
+            }
         }
 
         #region IDeviceController Members

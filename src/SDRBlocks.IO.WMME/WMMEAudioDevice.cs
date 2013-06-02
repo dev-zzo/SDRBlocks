@@ -2,6 +2,7 @@
 using System.Threading;
 using SDRBlocks.Core;
 using SDRBlocks.IO.WMME.Interop;
+using System.Collections.Generic;
 
 namespace SDRBlocks.IO.WMME
 {
@@ -13,6 +14,7 @@ namespace SDRBlocks.IO.WMME
             this.ChannelCount = channels;
 
             this.bufferPumpThread = new Thread(this.BufferPumpProc);
+            this.bufferPumpThread.Priority = ThreadPriority.Highest;
             this.bufferPumpThread.Start();
 
             this.CreateBuffers(bufferCount, framesPerBuffer, channels * sizeof(float));
@@ -37,11 +39,10 @@ namespace SDRBlocks.IO.WMME
 
         public bool IsReadyToProcess
         {
-            // This is always false since there is no actual processing to be done.
-            get { return false; }
+            get { return true; }
         }
 
-        public void Process()
+        public virtual void Process()
         {
         }
 
@@ -61,10 +62,10 @@ namespace SDRBlocks.IO.WMME
         protected IntPtr hWave;
         protected WaveBuffer[] buffers;
         protected readonly AutoResetEvent bufferAvailableEvent = new AutoResetEvent(false);
+        protected readonly Queue<WaveBuffer> availableBuffers = new Queue<WaveBuffer>();
 
         protected abstract void Open(int deviceIndex, ref WaveFormat format);
         protected abstract WaveBuffer CreateBuffer(uint numFrames, uint frameSize);
-        protected abstract void ProcessBuffer(WaveBuffer waveBuffer);
         protected abstract void Close();
 
         protected void InvokeProcessTrigger()
@@ -141,14 +142,23 @@ namespace SDRBlocks.IO.WMME
             while (!this.isClosing)
             {
                 this.bufferAvailableEvent.WaitOne();
-                foreach (WaveBuffer buffer in this.buffers)
+
+                lock (this.availableBuffers)
                 {
-                    if (buffer.IsDone)
+                    // NOTE: this can potentially mess up the buffer order.
+                    foreach (WaveBuffer buffer in this.buffers)
                     {
-                        this.ProcessBuffer(buffer);
+                        if (buffer.IsDone)
+                        {
+                            buffer.Unprepare();
+                            this.availableBuffers.Enqueue(buffer);
+                            // Placed here since this is the time reference generator.
+                            this.InvokeProcessTrigger();
+                        }
                     }
                 }
             }
+            Console.WriteLine("Buffer pump thread exited.");
         }
 
         #endregion

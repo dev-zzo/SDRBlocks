@@ -61,6 +61,9 @@ namespace SDRBlocks.IO.WMME.Interop
         public static extern MmResult waveOutUnprepareHeader(IntPtr hWaveOut, IntPtr lpWaveOutHdr, int uSize);
 
         [DllImport("winmm.dll")]
+        public static extern MmResult waveOutReset(IntPtr hWaveOut);
+
+        [DllImport("winmm.dll")]
         public static extern MmResult waveOutClose(IntPtr hWaveOut);
 
 
@@ -95,6 +98,9 @@ namespace SDRBlocks.IO.WMME.Interop
         // http://msdn.microsoft.com/en-us/library/dd743852%28VS.85%29.aspx
         [DllImport("winmm.dll")]
         public static extern MmResult waveInStop(IntPtr hWaveIn);
+
+        [DllImport("winmm.dll")]
+        public static extern MmResult waveInReset(IntPtr hWaveIn);
 
         [DllImport("winmm.dll")]
         public static extern MmResult waveInClose(IntPtr hWaveIn);

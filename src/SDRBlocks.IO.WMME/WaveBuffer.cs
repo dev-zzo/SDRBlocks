@@ -45,6 +45,8 @@ namespace SDRBlocks.IO.WMME
 
         public abstract void Prepare(IntPtr hWave);
 
+        public abstract void Unprepare();
+
         #region IDisposable Members
 
         public void Dispose()
@@ -62,8 +64,6 @@ namespace SDRBlocks.IO.WMME
         protected IntPtr hWave;
         protected WaveHeader header;
         protected IntPtr headerPtr;
-
-        protected abstract void Unprepare();
 
         private Array backBuffer;
         private GCHandle dataHandle;
@@ -91,9 +91,10 @@ namespace SDRBlocks.IO.WMME
             WMMEException.Check(Wave.waveOutPrepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }
 
-        protected override void Unprepare()
+        public override void Unprepare()
         {
             WMMEException.Check(Wave.waveOutUnprepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
+            this.header.flags = 0;
         }
     }
 
@@ -115,9 +116,10 @@ namespace SDRBlocks.IO.WMME
             WMMEException.Check(Wave.waveInPrepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
         }
 
-        protected override void Unprepare()
+        public override void Unprepare()
         {
             WMMEException.Check(Wave.waveInUnprepareHeader(this.hWave, this.headerPtr, Marshal.SizeOf(this.header)));
+            this.header.flags = 0;
         }
     }
 }

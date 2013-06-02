@@ -14,6 +14,7 @@ namespace SDRBlocks.Core.Processing
                 Thread thread = new Thread(ThreadProc);
                 threads[i] = thread;
                 thread.Priority = ThreadPriority.AboveNormal;
+                thread.Name = "PoolWorker";
                 thread.Start();
             }
         }

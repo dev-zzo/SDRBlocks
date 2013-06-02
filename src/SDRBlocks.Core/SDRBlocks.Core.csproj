@@ -36,8 +36,12 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DspBlocks\Bfo.cs" />
+    <Compile Include="DspBlocks\Cores\FirFilterCore.cs" />
+    <Compile Include="DspBlocks\Cores\OscillatorCore.cs" />
     <Compile Include="DspBlocks\FmDetector.cs" />
     <Compile Include="DspBlocks\Oscillator.cs" />
+    <Compile Include="DspBlocks\Resampler.cs" />
     <Compile Include="DspProcessor.cs" />
     <Compile Include="IProcessTrigger.cs" />
     <Compile Include="Maths\FastMath.cs" />
@@ -53,6 +57,7 @@
     <Compile Include="Maths\FilterHelper.cs" />
     <Compile Include="Maths\Fourier.cs" />
     <Compile Include="Maths\Resample.cs" />
+    <Compile Include="Maths\WindowFuncs.cs" />
     <Compile Include="Pin.cs" />
     <Compile Include="Processing\IProcessingItem.cs" />
     <Compile Include="Processing\ProcessingPool.cs" />

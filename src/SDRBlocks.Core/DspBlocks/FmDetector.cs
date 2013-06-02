@@ -6,6 +6,7 @@ namespace SDRBlocks.Core.DspBlocks
     /// <summary>
     /// Quadrature FM detector.
     /// Note that it does not perform any DC removal, filtering or other ops.
+    /// Reference: http://www.digitalsignallabs.com/Digradio.pdf
     /// </summary>
     public class FmDetector : IDspBlock
     {
@@ -14,7 +15,7 @@ namespace SDRBlocks.Core.DspBlocks
             this.Input = new SinkPin(this);
             this.Output = new SourcePin(this);
             // TODO: get a proper estimate for gain.
-            this.Gain = 0.00001f;
+            this.Gain = 0.01f;
             this.storedState = Complex.RealOne;
         }
 
@@ -71,14 +72,20 @@ namespace SDRBlocks.Core.DspBlocks
                 // s1 = M*e^(j*phi)
                 // f = M0*M*e^(j*phi - j*phi0)
                 // Thus, arg(f) is the measure of phase change between s0 and s1.
-                Complex f = inputBuffer[i] * ~state;
+                Complex s = inputBuffer[i];
+                Complex f = s * ~state;
 
                 // Angle estimate is our signal.
-                outputBuffer[i] = f.Arg() * this.Gain;
+                float m = f.Arg() * this.Gain;
+                outputBuffer[i] = m;
 
                 // Keep the value for the next iteration
-                state = inputBuffer[i];
+                state = s;
             }
+
+            // Advance the input data ptr.
+            sInput.Consumed(framesToProcess);
+            sOutput.Refilled(framesToProcess);
 
             // Update the stored state only once.
             this.storedState = state;

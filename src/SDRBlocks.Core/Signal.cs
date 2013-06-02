@@ -80,19 +80,27 @@ namespace SDRBlocks.Core
         /// Called by a sink pin's owner when data has been consumed.
         /// </summary>
         /// <param name="frameCount">How many frames have been consumed.</param>
-        public void NotifyOnConsume(int frameCount)
+        public void Consumed(int frameCount)
         {
-            this.MoveData(frameCount);
-            this.FrameCount -= frameCount;
+            lock (this)
+            {
+                this.MoveData(frameCount);
+                this.FrameCount -= frameCount;
+            }
+            // Console.WriteLine("Signal {0} consumed: {1}, now {2}", this.Name, frameCount, this.FrameCount);
         }
 
         /// <summary>
         /// Called by a source pin's owner.
         /// </summary>
         /// <param name="frameCount"></param>
-        public void NotifyOnRefill(int frameCount)
+        public void Refilled(int frameCount)
         {
-            this.FrameCount += frameCount;
+            lock (this)
+            {
+                this.FrameCount += frameCount;
+            }
+            // Console.WriteLine("Signal {0} refilled: {1}, now {2}", this.Name, frameCount, this.FrameCount);
         }
 
         #region IDisposable Members
@@ -108,6 +116,41 @@ namespace SDRBlocks.Core
 
         #endregion
 
+        #region Implementation details
+
+        internal void NotifyOnAttach(Pin pin)
+        {
+            SourcePin srcPin = pin as SourcePin;
+            if (srcPin != null)
+            {
+                this.SourcePin = srcPin;
+                return;
+            }
+            SinkPin sinkPin = pin as SinkPin;
+            if (sinkPin != null)
+            {
+                this.SinkPin = sinkPin;
+                return;
+            }
+            // Didn't expect that.
+        }
+
+        internal void NotifyOnDetach(Pin pin)
+        {
+            if (pin == this.SourcePin)
+            {
+                this.SourcePin = null;
+            }
+            else if (pin == this.SinkPin)
+            {
+                this.SinkPin = null;
+            }
+            else
+            {
+                // Didn't expect that.
+            }
+        }
+
         private static int signalCounter = 0;
         private readonly Array backBuffer;
         private GCHandle backBufferHandle;
@@ -119,5 +162,7 @@ namespace SDRBlocks.Core
             // NOTE: Potentially use this.FrameCount to decrease amount of data moved.
             MemFuncs.MemMove(this.data, src, (UIntPtr)((this.Size - frameCount) * this.FrameSize));
         }
+
+        #endregion
     }
 }

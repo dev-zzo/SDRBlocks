@@ -1,14 +1,15 @@
 ﻿using System;
 using SDRBlocks.Core;
-using SDRBlocks.IO.WMME.Interop;
 using SDRBlocks.Core.Interop;
+using SDRBlocks.IO.WMME.Interop;
+using System.Collections.Generic;
 
 namespace SDRBlocks.IO.WMME
 {
     public sealed class WMMEInputDevice : WMMEAudioDevice
     {
         public WMMEInputDevice(int deviceIndex, uint channels, uint frameRate)
-            : base(deviceIndex, channels, frameRate, 3, 2048)
+            : base(deviceIndex, channels, frameRate, 3, 2048/* * (frameRate / 48000)*/)
         {
             this.Output = new SourcePin(this);
         }
@@ -18,6 +19,29 @@ namespace SDRBlocks.IO.WMME
         public override bool IsIndependent
         {
             get { return true; }
+        }
+
+        public override void Process()
+        {
+            lock (this.availableBuffers)
+            {
+                while (this.availableBuffers.Count > 0)
+                {
+                    WaveBuffer waveBuffer = this.availableBuffers.Dequeue();
+
+                    if (this.Output.IsConnected)
+                    {
+                        Signal signal = this.Output.AttachedSignal;
+                        IntPtr dest = signal.Data + signal.FrameCount * (int)this.FrameSize;
+                        int framesToCopy = Math.Min((int)waveBuffer.Size, signal.Size - signal.FrameCount);
+                        MemFuncs.MemCopy(dest, waveBuffer.Buffer, (UIntPtr)(this.FrameSize * framesToCopy));
+                        signal.Refilled(framesToCopy);
+                    }
+
+                    waveBuffer.Prepare(this.hWave);
+                    waveBuffer.Submit();
+                }
+            }
         }
 
         #region Implementation details
@@ -41,27 +65,13 @@ namespace SDRBlocks.IO.WMME
             return new WaveBufferIn(numFrames, frameSize);
         }
 
-        protected override void ProcessBuffer(WaveBuffer waveBuffer)
-        {
-            if (this.Output.IsConnected)
-            {
-                Signal signal = this.Output.AttachedSignal;
-                IntPtr dest = signal.Data + signal.FrameCount * signal.FrameSize;
-                int framesToCopy = Math.Min((int)waveBuffer.Size, signal.Size - signal.FrameCount);
-                MemFuncs.MemCopy(dest, waveBuffer.Buffer, (UIntPtr)(framesToCopy * signal.FrameSize));
-                signal.NotifyOnRefill(framesToCopy);
-            }
-
-            waveBuffer.Submit();
-            this.InvokeProcessTrigger();
-        }
-
         protected override void Close()
         {
             if (this.hWave != IntPtr.Zero)
             {
                 this.isClosing = true;
-                Wave.waveInStop(this.hWave);
+                //Wave.waveInStop(this.hWave);
+                //Wave.waveInReset(this.hWave);
                 this.ReleaseBuffers();
                 Wave.waveInClose(this.hWave);
                 this.hWave = IntPtr.Zero;
