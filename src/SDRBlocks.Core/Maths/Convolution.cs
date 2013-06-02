@@ -55,5 +55,25 @@ namespace SDRBlocks.Core.Maths
             }
             return s;
         }
+
+        public static float Convolve(float* input, float* kernel, int kernelSize)
+        {
+            float s = 0.0f;
+            for (int i = 0; i < kernelSize; ++i)
+            {
+                s += input[i] * kernel[kernelSize - i];
+            }
+            return s;
+        }
+
+        public static float Convolve(float* input, int stride, float* kernel, int kernelSize)
+        {
+            float s = 0.0f;
+            for (int i = 0; i < kernelSize; ++i)
+            {
+                s += input[i * stride] * kernel[kernelSize - i];
+            }
+            return s;
+        }
     }
 }

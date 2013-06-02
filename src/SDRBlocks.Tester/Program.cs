@@ -34,19 +34,28 @@ namespace SDRBlocks.Tester
             proc.AddBlock(output);
             FmDetector detector = new FmDetector();
             proc.AddBlock(detector);
+            FirFilter filter = new FirFilter();
+            filter.CutoffFrequency = 15000.0f;
+            filter.Length = 301;
+            proc.AddBlock(filter);
 
             Signal s1 = new Signal(192000, 1, FrameFormat.Complex, 65536);
             s1.Name = "In->FM";
             Signal s2 = new Signal(192000, 1, FrameFormat.Float32, 65536);
-            s2.Name = "FM->Out";
+            s2.Name = "FM->FIR";
+            Signal s3 = new Signal(192000, 1, FrameFormat.Float32, 65536);
+            s3.Name = "FIR->Out";
             input.Output.AttachedSignal = s1;
-            detector.Input.AttachedSignal = s1;
+            detector.InputIQ.AttachedSignal = s1;
             detector.Output.AttachedSignal = s2;
-            output.Input.AttachedSignal = s2;
+            filter.Input.AttachedSignal = s2;
+            filter.Output.AttachedSignal = s3;
+            output.Input.AttachedSignal = s3;
 
             input.ProcessTriggerEvent += procDelegate;
 
-            Thread.Sleep(3000);
+            //Thread.Sleep(60000);
+            Console.ReadLine();
 
             Console.WriteLine("Done!");
             input.Dispose();

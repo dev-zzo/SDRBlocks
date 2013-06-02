@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Runtime.InteropServices;
 using SDRBlocks.Core.Maths;
 
 namespace SDRBlocks.Core.DspBlocks.Cores
@@ -14,7 +12,7 @@ namespace SDRBlocks.Core.DspBlocks.Cores
         BandReject,
     }
 
-    public class FirFilterCore
+    public unsafe class FirFilterCore
     {
         public FirFilterCore()
         {
@@ -38,6 +36,13 @@ namespace SDRBlocks.Core.DspBlocks.Cores
 
         public void Configure(FirFilterType type, float frequency, float bandwidth, int length, int sampleRate)
         {
+            if (this.kernel != null)
+            {
+                this.kernelHandle.Free();
+                this.kernel = null;
+                this.kernelPtr = null;
+            }
+
             float[] newKernel = null;
 
             switch (type)
@@ -71,20 +76,31 @@ namespace SDRBlocks.Core.DspBlocks.Cores
             this.frequency = frequency;
             this.bandwidth = bandwidth;
             this.kernel = newKernel;
+            this.kernelHandle = GCHandle.Alloc(this.kernel, GCHandleType.Pinned);
+            this.kernelPtr = (float*)this.kernelHandle.AddrOfPinnedObject();
         }
 
-        public unsafe Complex GetNextSample(Complex* input)
+        public Complex GetNextSample(Complex* input)
         {
-            fixed(float* h = this.kernel)
-            {
-                return Convolution.Convolve(input, h, this.kernel.Length);
-            }
+            return Convolution.Convolve(input, this.kernelPtr, this.kernel.Length);
+        }
+
+        public float GetNextSample(float* input)
+        {
+            return Convolution.Convolve(input, this.kernelPtr, this.kernel.Length);
+        }
+
+        public float GetNextSample(float* input, int channels)
+        {
+            return Convolution.Convolve(input, channels, this.kernelPtr, this.kernel.Length);
         }
 
         private FirFilterType type;
         private float frequency;
         private float bandwidth;
         private float[] kernel;
+        private float* kernelPtr;
+        private GCHandle kernelHandle;
 
         private static float[] MakeLowPassKernel(float cutoffFrequency, int length, int sampleRate, WindowType window)
         {

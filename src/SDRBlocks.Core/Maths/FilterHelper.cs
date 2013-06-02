@@ -16,7 +16,7 @@ namespace SDRBlocks.Core.Maths
         /// <returns></returns>
         public static float[] BuildSincFilter(float cutoffFreq, int length, int sampleRate)
         {
-            if (length % 2 != 0)
+            if (length % 2 == 0)
             {
                 throw new ArgumentException("Length must be odd.");
             }

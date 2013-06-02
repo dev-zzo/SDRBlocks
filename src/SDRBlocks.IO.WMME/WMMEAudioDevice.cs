@@ -15,6 +15,7 @@ namespace SDRBlocks.IO.WMME
 
             this.bufferPumpThread = new Thread(this.BufferPumpProc);
             this.bufferPumpThread.Priority = ThreadPriority.Highest;
+            this.bufferPumpThread.Name = "WMME Buffer Pump";
             this.bufferPumpThread.Start();
 
             this.CreateBuffers(bufferCount, framesPerBuffer, channels * sizeof(float));

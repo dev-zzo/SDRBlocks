@@ -39,6 +39,7 @@
     <Compile Include="DspBlocks\Bfo.cs" />
     <Compile Include="DspBlocks\Cores\FirFilterCore.cs" />
     <Compile Include="DspBlocks\Cores\OscillatorCore.cs" />
+    <Compile Include="DspBlocks\FirFilter.cs" />
     <Compile Include="DspBlocks\FmDetector.cs" />
     <Compile Include="DspBlocks\Oscillator.cs" />
     <Compile Include="DspBlocks\Resampler.cs" />

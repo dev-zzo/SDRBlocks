@@ -12,17 +12,17 @@ namespace SDRBlocks.Core.DspBlocks
     {
         public FmDetector()
         {
-            this.Input = new SinkPin(this);
+            this.InputIQ = new SinkPin(this);
             this.Output = new SourcePin(this);
             // TODO: get a proper estimate for gain.
-            this.Gain = 0.01f;
+            this.Gain = 0.1f;
             this.storedState = Complex.RealOne;
         }
 
         /// <summary>
         /// Complex IQ input.
         /// </summary>
-        public SinkPin Input { get; private set; }
+        public SinkPin InputIQ { get; private set; }
 
         /// <summary>
         /// Scalar output.
@@ -42,9 +42,9 @@ namespace SDRBlocks.Core.DspBlocks
         {
             get 
             {
-                if (!this.Input.IsConnected)
+                if (!this.InputIQ.IsConnected)
                     return false;
-                if (this.Input.AttachedSignal.FrameCount < 1)
+                if (this.InputIQ.AttachedSignal.FrameCount < 1)
                     return false;
                 return true;
             }
@@ -52,11 +52,11 @@ namespace SDRBlocks.Core.DspBlocks
 
         public unsafe void Process()
         {
-            if (!this.Input.IsConnected || !this.Output.IsConnected)
+            if (!this.InputIQ.IsConnected || !this.Output.IsConnected)
                 return;
 
             // Get the input buffer
-            Signal sInput = this.Input.AttachedSignal;
+            Signal sInput = this.InputIQ.AttachedSignal;
             Complex* inputBuffer = (Complex*)sInput.Data.ToPointer();
             // Get the output buffer
             // Note that it is shifted by the frame count.

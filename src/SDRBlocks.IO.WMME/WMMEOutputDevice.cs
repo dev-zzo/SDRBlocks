@@ -33,7 +33,7 @@ namespace SDRBlocks.IO.WMME
                         Signal signal = this.Input.AttachedSignal;
                         int frameCount = (int)waveBuffer.Size;
 
-                        if (signal.FrameCount >= frameCount)
+                        if (signal.FrameCount > frameCount)
                         {
                             MemFuncs.MemCopy(waveBuffer.Buffer, signal.Data, (UIntPtr)(this.FrameSize * frameCount));
                             signal.Consumed(frameCount);
